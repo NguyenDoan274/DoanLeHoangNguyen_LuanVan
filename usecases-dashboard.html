@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS Functional Usecase & Flowchart Dashboard</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Marked.js (Markdown parser) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  
+  <!-- Mermaid.js (Diagram rendering) -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  
+  <!-- PlantUML Encoder -->
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder@1.4.0/dist/plantuml-encoder.min.js"></script>
+  
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-sidebar: #0f1524;
+      --bg-card: rgba(22, 30, 49, 0.7);
+      --bg-card-hover: rgba(30, 41, 67, 0.8);
+      --bg-input: #172033;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.2);
+      
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      
+      --color-primary: #6366f1;
+      --color-primary-glow: rgba(99, 102, 241, 0.35);
+      --color-secondary: #06b6d4;
+      --color-accent: #ec4899;
+      
+      --badge-student: #3b82f6;
+      --badge-instructor: #10b981;
+      --badge-admin: #f59e0b;
+      
+      --color-get: #3b82f6;
+      --color-post: #10b981;
+      --color-patch: #f59e0b;
+      --color-delete: #ef4444;
+      
+      --font-sans: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      
+      --sidebar-width: 340px;
+      --transition-speed: 0.25s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-primary);
+    }
+
+    /* Layout */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 45%);
+    }
+
+    /* Sidebar Components */
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-icon {
+      color: var(--color-primary);
+      filter: drop-shadow(0 0 8px var(--color-primary-glow));
+    }
+
+    .logo-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .search-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 14px 10px 40px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-family: var(--font-sans);
+      transition: all var(--transition-speed) ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .actor-filters {
+      display: flex;
+      gap: 8px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .filter-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 6px 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition-speed) ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--color-primary-glow);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .usecase-list-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 16px 12px;
+    }
+
+    .list-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin: 16px 12px 8px 12px;
+      font-weight: 700;
+    }
+
+    .usecase-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all var(--transition-speed) ease;
+      border: 1px solid transparent;
+    }
+
+    .usecase-item:hover {
+      background-color: var(--bg-card);
+      border-color: var(--border-color);
+    }
+
+    .usecase-item.active {
+      background-color: var(--color-primary-glow);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    }
+
+    .usecase-item-icon {
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      flex-shrink: 0;
+    }
+
+    .usecase-item.active .usecase-item-icon {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .usecase-item-info {
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .usecase-item-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .usecase-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-user {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: var(--badge-student);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-instructor {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--badge-instructor);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-admin {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: var(--badge-admin);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* Main view headers */
+    .content-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(15, 21, 36, 0.4);
+      backdrop-filter: blur(8px);
+    }
+
+    .content-header-title-area {
+      max-width: 70%;
+    }
+
+    .content-header-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .content-header-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-text {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .content-header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-speed) ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    /* Tabs Bar */
+    .tabs-bar {
+      display: flex;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border-color);
+      background-color: rgba(15, 21, 36, 0.2);
+    }
+
+    .tab-item {
+      padding: 16px 24px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition-speed) ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-item:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-item.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+
+    /* Main Inspector Area */
+    .inspector-body {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 32px;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn var(--transition-speed) ease-in-out;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Grids */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color var(--transition-speed) ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-glow);
+    }
+
+    .card-full {
+      grid-column: span 2;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    /* Markdown Styling Customizations */
+    .md-content {
+      font-size: 0.925rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    .md-content p {
+      margin-bottom: 12px;
+    }
+
+    .md-content ul, .md-content ol {
+      margin-bottom: 12px;
+      padding-left: 20px;
+    }
+
+    .md-content li {
+      margin-bottom: 6px;
+    }
+
+    .md-content h1, .md-content h2, .md-content h3 {
+      color: #fff;
+      margin-top: 16px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .md-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.85rem;
+    }
+
+    .md-content th, .md-content td {
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .md-content th {
+      background-color: rgba(255, 255, 255, 0.04);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .md-content tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.01);
+    }
+
+    .md-content pre {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 12px 0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .md-content code {
+      font-family: var(--font-mono);
+      font-size: 0.825rem;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background-color: rgba(255, 255, 255, 0.08);
+      color: #ec4899;
+    }
+
+    .md-content pre code {
+      background-color: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* APIs Explorer */
+    .api-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .api-header {
+      display: flex;
+      align-items: center;
+      padding: 14px 20px;
+      background: rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-speed) ease;
+    }
+
+    .api-header:hover {
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .api-badge {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-right: 12px;
+      width: 75px;
+      text-align: center;
+      color: white;
+    }
+
+    .api-badge.get { background-color: var(--color-get); }
+    .api-badge.post { background-color: var(--color-post); }
+    .api-badge.patch, .api-badge.put { background-color: var(--color-patch); }
+    .api-badge.delete { background-color: var(--color-delete); }
+
+    .api-path {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #fff;
+      flex-grow: 1;
+    }
+
+    .api-name {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .api-toggle-icon {
+      margin-left: 12px;
+      color: var(--text-muted);
+      transition: transform var(--transition-speed) ease;
+    }
+
+    .api-card.expanded .api-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .api-details {
+      padding: 20px;
+      border-top: 1px solid var(--border-color);
+      display: none;
+      background-color: rgba(10, 15, 28, 0.4);
+    }
+
+    .api-card.expanded .api-details {
+      display: block;
+    }
+
+    .api-code-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .code-container {
+      position: relative;
+    }
+
+    .code-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color var(--transition-speed) ease;
+    }
+
+    .copy-btn:hover {
+      color: var(--color-primary);
+    }
+
+    .api-details pre {
+      background-color: #060913;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      overflow-x: auto;
+      max-height: 250px;
+    }
+
+    .api-details code {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #a5b4fc;
+    }
+
+    /* Diagram Tab Layout */
+    .diagram-panel-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .diagram-selector-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .diagram-select {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .diagram-container {
+      background-color: #fff; /* White bg is excellent for displaying black-and-white UML flowcharts */
+      border-radius: 12px;
+      padding: 24px;
+      min-height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Empty states */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 40px;
+    }
+
+    .empty-icon {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .empty-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    /* UI suggestions styling */
+    .ui-mockup {
+      background-color: #1a1e2e;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      color: #10b981;
+      padding: 16px;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.4;
+      font-size: 0.8rem;
+    }
+
+    .ui-mockup-header {
+      background-color: #111422;
+      padding: 8px 16px;
+      margin: -16px -16px 16px -16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      gap: 6px;
+    }
+
+    .ui-mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #ef4444;
+    }
+
+    .ui-mockup-dot:nth-child(2) { background-color: #f59e0b; }
+    .ui-mockup-dot:nth-child(3) { background-color: #10b981; }
+
+    /* Info values */
+    .meta-value-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .meta-value-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.85rem;
+    }
+
+    .meta-value-table td.label {
+      color: var(--text-muted);
+      width: 30%;
+      font-weight: 500;
+    }
+
+    .meta-value-table td.value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .renderer-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 2px;
+      border: 1px solid var(--border-color);
+      gap: 2px;
+    }
+    
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all var(--transition-speed) ease;
+    }
+    
+    .toggle-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .toggle-btn.active {
+      background: var(--color-primary);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Usecases Browser -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <i data-lucide="git-branch" class="logo-icon" size="24"></i>
+        <span class="logo-text">LMS Flow Analyzer</span>
+      </div>
+      <div class="search-box">
+        <i data-lucide="search" class="search-icon" size="18"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm usecase, API, bảng..." oninput="handleSearch()">
+      </div>
+    </div>
+    
+    <div class="actor-filters">
+      <button class="filter-btn active" id="filter-all" onclick="filterActor('all')">Tất cả</button>
+      <button class="filter-btn" id="filter-user" onclick="filterActor('user')">User</button>
+      <button class="filter-btn" id="filter-Instructor" onclick="filterActor('Instructor')">Giảng viên</button>
+      <button class="filter-btn" id="filter-admin" onclick="filterActor('admin')">Admin</button>
+    </div>
+
+    <div class="usecase-list-container" id="usecase-list">
+      <!-- Generated via JS -->
+    </div>
+  </aside>
+
+  <!-- Main View Area -->
+  <main class="main-content" id="main-content">
+    <!-- Rendered via JS -->
+    <div class="empty-state">
+      <i data-lucide="arrow-left-right" class="empty-icon" size="64"></i>
+      <h3 class="empty-title">Chọn một Use Case</h3>
+      <p>Chọn một use case chức năng từ thanh bên để xem sơ đồ luồng, đặc tả API, database và thông tin bảo mật.</p>
+    </div>
+  </main>
+
+  <!-- Data Script -->
+  <script src="usecase-data.js"></script>
+
+  <script>
+    // Fallback DBML in case fetch fails (CORS / file://)
+    const FALLBACK_DBML = `// LMS Database - Online Learning Platform
+// Stack: Next.js + NestJS + PostgreSQL + Mux
+// Removed: refresh_tokens, certificates
+
+Enum user_role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+Enum user_status {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+Enum instructor_request_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+Enum course_level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+Enum course_status {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+  ARCHIVED
+}
+
+Enum mux_status {
+  NO_VIDEO
+  PROCESSING
+  READY
+  ERRORED
+}
+
+Enum enrollment_status {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+Enum question_type {
+  MULTIPLE_CHOICE
+  ESSAY
+}
+
+Enum attempt_status {
+  IN_PROGRESS
+  SUBMITTED
+  GRADED
+}
+
+Table users {
+  id uuid [primary key]
+  full_name varchar [not null]
+  email varchar [not null, unique]
+  password_hash text [not null]
+  avatar_url text
+  role user_role [not null, default: 'STUDENT']
+  status user_status [not null, default: 'ACTIVE']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table instructor_requests {
+  id uuid [primary key]
+  user_id uuid [not null]
+  status instructor_request_status [not null, default: 'PENDING']
+  reason text
+  experience text
+  expertise varchar
+  admin_note text
+  reviewed_by uuid
+  reviewed_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table categories {
+  id uuid [primary key]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  description text
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table courses {
+  id uuid [primary key]
+  instructor_id uuid [not null]
+  category_id uuid
+  title varchar [not null]
+  slug varchar [not null, unique]
+  short_description text
+  description text
+  thumbnail_url text
+  level course_level [not null, default: 'BEGINNER']
+  status course_status [not null, default: 'DRAFT']
+  price decimal(10,2) [default: 0]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table course_sections {
+  id uuid [primary key]
+  course_id uuid [not null]
+  title varchar [not null]
+  description text
+  order_index integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table lessons {
+  id uuid [primary key]
+  section_id uuid [not null]
+  title varchar [not null]
+  content text
+  order_index integer [not null]
+  is_preview boolean [default: false]
+
+  // Mux video information
+  mux_upload_id varchar
+  mux_asset_id varchar
+  mux_playback_id varchar
+  mux_status mux_status [default: 'NO_VIDEO']
+  duration_sec integer
+
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table lesson_resources {
+  id uuid [primary key]
+  lesson_id uuid [not null]
+  file_name varchar [not null]
+  file_url text [not null]
+  file_type varchar
+  file_size bigint
+  created_at timestamp
+}
+
+Table enrollments {
+  id uuid [primary key]
+  student_id uuid [not null]
+  course_id uuid [not null]
+  status enrollment_status [not null, default: 'ACTIVE']
+  enrolled_at timestamp
+  completed_at timestamp
+
+  indexes {
+    (student_id, course_id) [unique]
+  }
+}
+
+Table lesson_progress {
+  id uuid [primary key]
+  enrollment_id uuid [not null]
+  lesson_id uuid [not null]
+  is_completed boolean [default: false]
+  watched_seconds integer [default: 0]
+  completed_at timestamp
+  updated_at timestamp
+
+  indexes {
+    (enrollment_id, lesson_id) [unique]
+  }
+}
+
+Table quizzes {
+  id uuid [primary key]
+  course_id uuid [not null]
+  lesson_id uuid
+  title varchar [not null]
+  description text
+  time_limit_minutes integer
+  passing_score decimal(5,2) [default: 0]
+  max_attempts integer [default: 1]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table questions {
+  id uuid [primary key]
+  quiz_id uuid [not null]
+  question_text text [not null]
+  question_type question_type [not null]
+  score decimal(5,2) [default: 1]
+  order_index integer [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table question_options {
+  id uuid [primary key]
+  question_id uuid [not null]
+  option_text text [not null]
+  is_correct boolean [default: false]
+  order_index integer [not null]
+}
+
+Table quiz_attempts {
+  id uuid [primary key]
+  quiz_id uuid [not null]
+  student_id uuid [not null]
+  enrollment_id uuid [not null]
+  status attempt_status [not null, default: 'IN_PROGRESS']
+  total_score decimal(5,2) [default: 0]
+  is_passed boolean [default: false]
+  started_at timestamp
+  submitted_at timestamp
+  graded_at timestamp
+}
+
+Table quiz_answers {
+  id uuid [primary key]
+  attempt_id uuid [not null]
+  question_id uuid [not null]
+  selected_option_id uuid
+  essay_answer text
+  score decimal(5,2) [default: 0]
+  feedback text
+  graded_by uuid
+  graded_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+
+// Relationships
+
+Ref: instructor_requests.user_id > users.id
+Ref: instructor_requests.reviewed_by > users.id
+
+Ref: courses.instructor_id > users.id
+Ref: courses.category_id > categories.id
+
+Ref: course_sections.course_id > courses.id
+
+Ref: lessons.section_id > course_sections.id
+
+Ref: lesson_resources.lesson_id > lessons.id
+
+Ref: enrollments.student_id > users.id
+Ref: enrollments.course_id > courses.id
+
+Ref: lesson_progress.enrollment_id > enrollments.id
+Ref: lesson_progress.lesson_id > lessons.id
+
+Ref: quizzes.course_id > courses.id
+Ref: quizzes.lesson_id > lessons.id
+
+Ref: questions.quiz_id > quizzes.id
+
+Ref: question_options.question_id > questions.id
+
+Ref: quiz_attempts.quiz_id > quizzes.id
+Ref: quiz_attempts.student_id > users.id
+Ref: quiz_attempts.enrollment_id > enrollments.id
+
+Ref: quiz_answers.attempt_id > quiz_attempts.id
+Ref: quiz_answers.question_id > questions.id
+Ref: quiz_answers.selected_option_id > question_options.id
+Ref: quiz_answers.graded_by > users.id`;
+
+    // Global State
+    let currentActorFilter = 'all';
+    let currentSearchQuery = '';
+    let selectedUsecaseId = null;
+    let selectedTab = 'overview';
+    let activeSequenceIdx = 0;
+    let diagramRenderer = 'plantuml';
+    let dbmlContent = '';
+
+    // Load DBML content from db.md or use fallback
+    async function loadDbml() {
+      try {
+        const response = await fetch('docs/db/db.md');
+        if (response.ok) {
+          dbmlContent = await response.text();
+        } else {
+          dbmlContent = FALLBACK_DBML;
+        }
+      } catch (err) {
+        console.warn("Could not fetch db.md directly, using fallback.", err);
+        dbmlContent = FALLBACK_DBML;
+      }
+      
+      // If the code tab is currently showing, update the raw code content
+      const dbmlCodeElem = document.getElementById('dbml-raw-code');
+      if (dbmlCodeElem) {
+        dbmlCodeElem.innerText = dbmlContent;
+      }
+    }
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize icons
+      lucide.createIcons();
+      
+      // Load DBML first
+      loadDbml();
+      
+      // Load usecases list
+      renderUsecaseList();
+      
+      // Configure marked option
+      marked.setOptions({
+        headerIds: false,
+        mangle: false
+      });
+      
+      // Initialize Mermaid
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose',
+        sequence: {
+          showSequenceNumbers: true,
+          useMaxWidth: true,
+          boxMargin: 8,
+          actorMargin: 50
+        }
+      });
+    });
+
+    // Helper: format names to Title Case or nicely readable text
+    function formatActorName(actor) {
+      if (actor === 'user') return 'Học viên (User)';
+      if (actor === 'Instructor') return 'Giảng viên';
+      if (actor === 'admin') return 'Quản trị viên (Admin)';
+      return actor;
+    }
+
+    function getActorBadgeClass(actor) {
+      if (actor === 'user') return 'badge-user';
+      if (actor === 'Instructor') return 'badge-instructor';
+      if (actor === 'admin') return 'badge-admin';
+      return '';
+    }
+
+    // Render Usecase items in the sidebar
+    function renderUsecaseList() {
+      const listContainer = document.getElementById('usecase-list');
+      listContainer.innerHTML = '';
+
+      // Check if DB Schema should be shown based on filters
+      let showDbSchema = true;
+      if (currentActorFilter !== 'all') {
+        showDbSchema = false;
+      }
+      if (currentSearchQuery) {
+        const query = currentSearchQuery.toLowerCase();
+        if (!("sơ đồ database erd dbml db.md".includes(query) || "database".includes(query) || "sơ đồ".includes(query) || "db".includes(query))) {
+          showDbSchema = false;
+        }
+      }
+
+      if (showDbSchema) {
+        const dbActive = selectedUsecaseId === 'db-schema';
+        const dbItemDiv = document.createElement('div');
+        dbItemDiv.className = `usecase-item ${dbActive ? 'active' : ''}`;
+        dbItemDiv.onclick = () => selectDbSchema();
+        dbItemDiv.innerHTML = `
+          <div class="usecase-item-icon" style="background: rgba(99, 102, 241, 0.15); color: var(--color-primary);">
+            <i data-lucide="database" size="16"></i>
+          </div>
+          <div class="usecase-item-info">
+            <div class="usecase-item-name" style="font-weight: 700">Toàn bộ Sơ đồ Database</div>
+            <div class="usecase-item-meta">
+              <span>dbdiagram.io & DBML</span>
+            </div>
+          </div>
+        `;
+        listContainer.appendChild(dbItemDiv);
+      }
+
+      // Group by categories
+      const groups = {
+        'user': { name: 'User / Học viên', items: [] },
+        'Instructor': { name: 'Giảng viên', items: [] },
+        'admin': { name: 'Admin', items: [] }
+      };
+
+      // Filter and push
+      USECASES_DATA.forEach((uc, index) => {
+        // Filter by actor
+        if (currentActorFilter !== 'all' && uc.actorGroup !== currentActorFilter) return;
+        
+        // Filter by search
+        if (currentSearchQuery) {
+          const query = currentSearchQuery.toLowerCase();
+          const matchTitle = uc.title.toLowerCase().includes(query);
+          const matchGoal = uc.goal.toLowerCase().includes(query);
+          const matchApis = uc.apis.some(api => api.name.toLowerCase().includes(query) || api.path.toLowerCase().includes(query));
+          const matchDb = uc.database.toLowerCase().includes(query);
+          
+          if (!matchTitle && !matchGoal && !matchApis && !matchDb) return;
+        }
+
+        groups[uc.actorGroup].items.push({ uc, index });
+      });
+
+      // Render categories
+      for (const key in groups) {
+        const group = groups[key];
+        if (group.items.length === 0) continue;
+
+        const sectionHeader = document.createElement('div');
+        sectionHeader.className = 'list-section-title';
+        sectionHeader.innerText = group.name;
+        listContainer.appendChild(sectionHeader);
+
+        group.items.forEach(item => {
+          const isActive = selectedUsecaseId === item.index;
+          const itemDiv = document.createElement('div');
+          itemDiv.className = `usecase-item ${isActive ? 'active' : ''}`;
+          itemDiv.onclick = () => selectUsecase(item.index);
+
+          const badgeClass = getActorBadgeClass(item.uc.actorGroup);
+          const actorLabel = item.uc.actorGroup === 'user' ? 'USER' : item.uc.actorGroup === 'Instructor' ? 'INST' : 'ADM';
+
+          itemDiv.innerHTML = `
+            <div class="usecase-item-icon">
+              <i data-lucide="file-text" size="16"></i>
+            </div>
+            <div class="usecase-item-info">
+              <div class="usecase-item-name" title="${item.uc.title}">${item.uc.title}</div>
+              <div class="usecase-item-meta">
+                <span class="badge ${badgeClass}">${actorLabel}</span>
+                <span>${item.uc.apis.length} APIs</span>
+              </div>
+            </div>
+          `;
+          listContainer.appendChild(itemDiv);
+        });
+      }
+
+      // Re-create icons
+      lucide.createIcons();
+    }
+
+    // Filter by Actor Group
+    function filterActor(actor) {
+      currentActorFilter = actor;
+      
+      // Update buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`filter-${actor}`).classList.add('active');
+      
+      renderUsecaseList();
+    }
+
+    // Search input handler
+    function handleSearch() {
+      currentSearchQuery = document.getElementById('search-input').value;
+      renderUsecaseList();
+    }
+
+    // Select usecase
+    function selectUsecase(id) {
+      selectedUsecaseId = id;
+      activeSequenceIdx = 0; // reset sequence tab index
+      
+      // Re-render sidebar items to update active class
+      renderUsecaseList();
+      
+      // Render details
+      renderUsecaseDetails();
+    }
+
+    // Select Database Schema
+    function selectDbSchema() {
+      selectedUsecaseId = 'db-schema';
+      // Re-render sidebar items to update active class
+      renderUsecaseList();
+      // Render database schema view
+      renderUsecaseDetails();
+    }
+
+    // PlantUML Sequence to Mermaid code translator
+    function translatePlantUMLtoMermaid(puml) {
+      if (!puml) return '';
+      let lines = puml.split('\n');
+      let mLines = ['sequenceDiagram'];
+      
+      for (let line of lines) {
+        let trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('@startuml') || trimmed.startsWith('@enduml') || trimmed.startsWith('autonumber')) {
+          continue;
+        }
+        
+        // Convert declarations
+        // actor "Admin" as Actor -> actor Actor as Admin
+        // participant "Next.js FE" as FE -> participant FE as Next.js FE
+        // database "PostgreSQL" as DB -> participant DB as PostgreSQL
+        let actorMatch = trimmed.match(/^(actor|participant|database)\s+"?([^"]+)"?\s+as\s+(\w+)/i);
+        if (actorMatch) {
+          let type = actorMatch[1].toLowerCase() === 'actor' ? 'actor' : 'participant';
+          mLines.push(`    ${type} ${actorMatch[3]} as ${actorMatch[2]}`);
+          continue;
+        }
+        
+        let simpleActorMatch = trimmed.match(/^(actor|participant|database)\s+(\w+)/i);
+        if (simpleActorMatch) {
+          let type = simpleActorMatch[1].toLowerCase() === 'actor' ? 'actor' : 'participant';
+          mLines.push(`    ${type} ${simpleActorMatch[2]}`);
+          continue;
+        }
+
+        // Convert arrows: from -> to : text
+        // Watch out for arrow types: ->, -->, ->>, etc.
+        let arrowMatch = trimmed.match(/^(\w+)\s*(-+>+)\s*(\w+)\s*:\s*(.*)$/);
+        if (arrowMatch) {
+          let from = arrowMatch[1];
+          let arrow = arrowMatch[2];
+          let to = arrowMatch[3];
+          let text = arrowMatch[4];
+          
+          let mArrow = arrow.includes('--') ? '-->>' : '->>';
+          mLines.push(`    ${from}${mArrow}${to}: ${text}`);
+          continue;
+        }
+
+        // Convert notes
+        let noteMatch = trimmed.match(/^note\s+(right of|left of|over)\s+([\w\s,]+)\s*:\s*(.*)$/i);
+        if (noteMatch) {
+          let placement = noteMatch[1];
+          let targets = noteMatch[2];
+          let text = noteMatch[3];
+          mLines.push(`    Note ${placement} ${targets}: ${text}`);
+          continue;
+        }
+
+        // Convert loops, alt, else
+        if (trimmed.startsWith('alt ') || trimmed.startsWith('else ') || trimmed === 'else' || trimmed === 'end' || trimmed.startsWith('loop ') || trimmed.startsWith('opt ')) {
+          mLines.push(`    ${trimmed}`);
+          continue;
+        }
+
+        // Convert activate/deactivate
+        if (trimmed.startsWith('activate ') || trimmed.startsWith('deactivate ')) {
+          mLines.push(`    ${trimmed}`);
+          continue;
+        }
+
+        if (trimmed.startsWith("'")) {
+          continue; // comment
+        }
+
+        mLines.push(`    ${trimmed}`);
+      }
+      return mLines.join('\n');
+    }
+
+    // Render selected usecase details in main screen
+    function renderUsecaseDetails() {
+      if (selectedUsecaseId === 'db-schema') {
+        renderDbSchemaView();
+        return;
+      }
+      const uc = USECASES_DATA[selectedUsecaseId];
+      const mainContainer = document.getElementById('main-content');
+      
+      const badgeClass = getActorBadgeClass(uc.actorGroup);
+      const actorLabel = formatActorName(uc.actorGroup);
+      
+      mainContainer.innerHTML = `
+        <div class="content-header">
+          <div class="content-header-title-area">
+            <h2 class="content-header-title">${uc.title}</h2>
+            <div class="content-header-subtitle">
+              <span class="badge ${badgeClass}">${actorLabel}</span>
+              <span class="icon-text"><i data-lucide="file-code" size="14"></i> ${uc.filename}</span>
+            </div>
+          </div>
+          <div class="content-header-actions">
+            <button class="btn-secondary" onclick="window.print()">
+              <i data-lucide="printer" size="16"></i> In ấn tài liệu
+            </button>
+          </div>
+        </div>
+        
+        <div class="tabs-bar">
+          <div class="tab-item ${selectedTab === 'overview' ? 'active' : ''}" onclick="switchTab('overview')">
+            <i data-lucide="info" size="16"></i> Tổng quan
+          </div>
+          <div class="tab-item ${selectedTab === 'db-api' ? 'active' : ''}" onclick="switchTab('db-api')">
+            <i data-lucide="database" size="16"></i> DB & APIs
+          </div>
+          <div class="tab-item ${selectedTab === 'flows' ? 'active' : ''}" onclick="switchTab('flows')">
+            <i data-lucide="git-pull-request" size="16"></i> Sơ đồ luồng
+          </div>
+          <div class="tab-item ${selectedTab === 'security' ? 'active' : ''}" onclick="switchTab('security')">
+            <i data-lucide="shield-alert" size="16"></i> Phân quyền & Bảo mật
+          </div>
+          <div class="tab-item ${selectedTab === 'ui-errors' ? 'active' : ''}" onclick="switchTab('ui-errors')">
+            <i data-lucide="layout-template" size="16"></i> Giao diện & Lỗi
+          </div>
+        </div>
+        
+        <div class="inspector-body">
+          
+          <!-- OVERVIEW TAB -->
+          <div class="tab-panel ${selectedTab === 'overview' ? 'active' : ''}">
+            <div class="info-grid">
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="target" size="18"></i> Mục tiêu Use Case</h4>
+                <div class="md-content">${marked.parse(uc.goal)}</div>
+              </div>
+              
+              <div class="card">
+                <h4 class="card-title"><i data-lucide="users" size="18"></i> Các Actor tham gia</h4>
+                <div class="md-content">${marked.parse(uc.actors)}</div>
+              </div>
+              
+              <div class="card">
+                <h4 class="card-title"><i data-lucide="shield-check" size="18"></i> Tiền điều kiện & Hậu điều kiện</h4>
+                <div class="md-content">${marked.parse(uc.prePostConditions)}</div>
+              </div>
+
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="compass" size="18"></i> Phạm vi chức năng</h4>
+                <div class="md-content">${marked.parse(uc.scope)}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- DATABASE & API TAB -->
+          <div class="tab-panel ${selectedTab === 'db-api' ? 'active' : ''}">
+            <div class="info-grid">
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="table" size="18"></i> Bảng Database liên quan</h4>
+                <div class="md-content">${marked.parse(uc.database)}</div>
+              </div>
+              
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="cpu" size="18"></i> Đặc tả API (${uc.apis.length})</h4>
+                
+                ${uc.apis.length === 0 ? '<p style="color:var(--text-muted)">Không có API nào được định nghĩa cho use case này.</p>' : ''}
+                
+                ${uc.apis.map((api, idx) => `
+                  <div class="api-card" id="api-card-${idx}">
+                    <div class="api-header" onclick="toggleApiCard(${idx})">
+                      <span class="api-badge ${api.method.toLowerCase()}">${api.method}</span>
+                      <span class="api-path">${api.path}</span>
+                      <span class="api-name">${api.name}</span>
+                      <i data-lucide="chevron-down" class="api-toggle-icon" size="16"></i>
+                    </div>
+                    <div class="api-details">
+                      <div class="api-code-grid">
+                        <div class="code-container">
+                          <div class="code-title">
+                            <span>Request Sample</span>
+                            <button class="copy-btn" onclick="copyCode(this, 'req-${idx}')"><i data-lucide="copy" size="14"></i></button>
+                          </div>
+                          <pre><code id="req-${idx}">${api.requestBody ? escapeHtml(api.requestBody) : '// No request body'}</code></pre>
+                        </div>
+                        
+                        <div class="code-container">
+                          <div class="code-title">
+                            <span>Response Sample</span>
+                            <button class="copy-btn" onclick="copyCode(this, 'res-${idx}')"><i data-lucide="copy" size="14"></i></button>
+                          </div>
+                          <pre><code id="res-${idx}">${api.responseBody ? escapeHtml(api.responseBody) : '// No response body'}</code></pre>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+          
+          <!-- FLOWS TAB -->
+          <div class="tab-panel ${selectedTab === 'flows' ? 'active' : ''}">
+            <div class="diagram-panel-content">
+              
+              ${uc.sequences.length > 0 ? `
+                <div class="card">
+                  <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                      <i data-lucide="git-commit" size="18"></i> Sơ đồ trình tự (Sequence Diagram)
+                    </span>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                      <!-- Renderer Toggle -->
+                      <div class="renderer-toggle">
+                        <button class="toggle-btn ${diagramRenderer === 'plantuml' ? 'active' : ''}" data-renderer="plantuml" onclick="setRenderer('plantuml')">PlantUML</button>
+                        <button class="toggle-btn ${diagramRenderer === 'mermaid' ? 'active' : ''}" data-renderer="mermaid" onclick="setRenderer('mermaid')">Mermaid</button>
+                      </div>
+                      
+                      ${uc.sequences.length > 1 ? `
+                        <div class="diagram-selector-area">
+                          <span style="font-size: 0.75rem; color: var(--text-secondary)">Chọn luồng:</span>
+                          <select class="diagram-select" onchange="changeSequence(this.value)">
+                            ${uc.sequences.map((seq, seqIdx) => {
+                              // Extract actor thao tac / sub flow name from sequence code if possible
+                              let line = seq.split('\n').find(l => l.includes('Thao tác') || l.includes('Luồng') || l.includes('thao tác'));
+                              let name = line ? line.replace(/.*Thao tác:\s*/i, '').replace(/.*luồng:\s*/i, '').replace(/Actor\s*->\s*\w+:\s*/i, '').trim() : `Luồng ${seqIdx + 1}`;
+                              if (name.length > 40) name = name.substring(0, 37) + '...';
+                              return `<option value="${seqIdx}" ${activeSequenceIdx === seqIdx ? 'selected' : ''}>${name}</option>`;
+                            }).join('')}
+                          </select>
+                        </div>
+                      ` : ''}
+                    </div>
+                  </div>
+                  
+                  <div class="diagram-container">
+                    <div id="mermaid-seq" style="width: 100%;">
+                      <!-- Rendered dynamically -->
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+              
+              <div class="info-grid">
+                <div class="card">
+                  <h4 class="card-title"><i data-lucide="arrow-right-left" size="18"></i> Luồng dữ liệu (Data Flow)</h4>
+                  <div class="md-content">${marked.parse(uc.dataFlow)}</div>
+                </div>
+                
+                <div class="card">
+                  <h4 class="card-title"><i data-lucide="activity" size="18"></i> Luồng hoạt động (Activity Flow)</h4>
+                  <div class="md-content">${marked.parse(uc.activityFlow)}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SECURITY TAB -->
+          <div class="tab-panel ${selectedTab === 'security' ? 'active' : ''}">
+            <div class="info-grid">
+              <div class="card">
+                <h4 class="card-title"><i data-lucide="key" size="18"></i> Kiểm tra phân quyền & Token</h4>
+                <div class="md-content">${marked.parse(uc.auth)}</div>
+              </div>
+              
+              <div class="card">
+                <h4 class="card-title"><i data-lucide="shield-check" size="18"></i> Quy tắc bảo mật dữ liệu</h4>
+                <div class="md-content">${marked.parse(uc.security)}</div>
+              </div>
+              
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="badge-check" size="18"></i> Quy tắc xác thực DTO (Validation Rules)</h4>
+                <div class="md-content">${marked.parse(uc.validation)}</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- UI & ERRORS TAB -->
+          <div class="tab-panel ${selectedTab === 'ui-errors' ? 'active' : ''}">
+            <div class="info-grid">
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="monitor" size="18"></i> Giao diện đề xuất (UI Wireframe)</h4>
+                ${uc.ui ? `<div class="ui-mockup"><div class="ui-mockup-header"><div class="ui-mockup-dot"></div><div class="ui-mockup-dot"></div><div class="ui-mockup-dot"></div></div>${escapeHtml(uc.ui)}</div>` : '<p style="color:var(--text-muted)">Không có gợi ý màn hình giao diện.</p>'}
+              </div>
+              
+              <div class="card card-full">
+                <h4 class="card-title"><i data-lucide="alert-triangle" size="18"></i> Ma trận xử lý lỗi (Error Handling)</h4>
+                <div class="md-content">${marked.parse(uc.errorHandling)}</div>
+              </div>
+              
+              ${uc.testCases ? `
+                <div class="card card-full">
+                  <h4 class="card-title"><i data-lucide="check-square" size="18"></i> Kịch bản kiểm thử (Test cases)</h4>
+                  <div class="md-content">${marked.parse(uc.testCases)}</div>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+          
+        </div>
+      `;
+      
+      // Re-create icons in the content
+      lucide.createIcons();
+      
+      // Render the active Mermaid diagram if flows tab is showing, or defer until tab is selected
+      if (selectedTab === 'flows') {
+        renderActiveDiagram();
+      }
+    }
+
+    // Switch inspector tab
+    function switchTab(tabName) {
+      selectedTab = tabName;
+      
+      // Update tab active states in UI
+      document.querySelectorAll('.tab-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.innerText.toLowerCase().includes(tabName === 'db-api' ? 'db' : tabName === 'flows' ? 'sơ đồ' : tabName === 'security' ? 'phân quyền' : tabName === 'ui-errors' ? 'giao diện' : 'tổng quan')) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Re-render usecase details to show current tab
+      renderUsecaseDetails();
+    }
+
+    // Toggle expansion of API Details Card
+    function toggleApiCard(idx) {
+      const card = document.getElementById(`api-card-${idx}`);
+      card.classList.toggle('expanded');
+    }
+
+    // Copy sample code
+    function copyCode(btn, codeId) {
+      const codeText = document.getElementById(codeId).innerText;
+      navigator.clipboard.writeText(codeText).then(() => {
+        const icon = btn.querySelector('i');
+        btn.innerHTML = '<i data-lucide="check" style="color:var(--badge-instructor)"></i>';
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="copy"></i>';
+          lucide.createIcons();
+        }, 1500);
+      });
+    }
+
+    // Select different sequence diagram
+    function changeSequence(idx) {
+      activeSequenceIdx = parseInt(idx);
+      renderActiveDiagram();
+    }
+
+    // Set rendering method (PlantUML server SVG vs local Mermaid translation)
+    function setRenderer(renderer) {
+      diagramRenderer = renderer;
+      // Update toggle button UI
+      document.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-renderer') === renderer) {
+          btn.classList.add('active');
+        }
+      });
+      renderActiveDiagram();
+    }
+
+    // Translate and Render Sequence Diagram (supports PlantUML server & Mermaid translation)
+    function renderActiveDiagram() {
+      const uc = USECASES_DATA[selectedUsecaseId];
+      if (!uc || uc.sequences.length === 0) return;
+      
+      const pumlCode = uc.sequences[activeSequenceIdx];
+      const container = document.getElementById('mermaid-seq');
+      
+      if (diagramRenderer === 'plantuml') {
+        // Render via PlantUML Server
+        try {
+          const encoded = plantumlEncoder.encode(pumlCode);
+          const imgUrl = `https://www.plantuml.com/plantuml/svg/${encoded}`;
+          container.className = ''; // Remove mermaid class to avoid conflicts
+          container.removeAttribute('data-processed');
+          container.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; padding: 10px 0;">
+              <img src="${imgUrl}" alt="Sequence Diagram (PlantUML)" style="max-width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+              <a href="${imgUrl}" target="_blank" style="margin-top: 14px; font-size: 0.75rem; color: var(--color-primary); text-decoration: none; display: flex; align-items: center; gap: 4px; font-weight: 600;">
+                <i data-lucide="external-link" size="12"></i> Xem ảnh SVG gốc độ nét cao trong tab mới
+              </a>
+            </div>
+          `;
+          lucide.createIcons();
+        } catch (err) {
+          console.error("PlantUML Encode Error: ", err);
+          container.innerHTML = `<div style="color:var(--color-delete); font-family:var(--font-mono); font-size:0.85rem; padding:12px;">Lỗi mã hóa PlantUML: <br>${escapeHtml(err.message)}</div>`;
+        }
+      } else {
+        // Render via local Mermaid Translation
+        const mermaidCode = translatePlantUMLtoMermaid(pumlCode);
+        container.className = 'mermaid';
+        container.removeAttribute('data-processed');
+        container.innerText = mermaidCode;
+        
+        try {
+          mermaid.run({
+            nodes: [container]
+          });
+        } catch (err) {
+          console.error("Mermaid Render Error: ", err);
+          container.innerHTML = `<div style="color:var(--color-delete); font-family:var(--font-mono); font-size:0.85rem; padding:12px;">Lỗi kết xuất sơ đồ Mermaid: <br>${escapeHtml(err.message)}</div>`;
+        }
+      }
+    }
+
+    // HTML escape utility
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Render Database Schema View
+    function renderDbSchemaView() {
+      const mainContainer = document.getElementById('main-content');
+      
+      // Get the saved dbdiagram embed link or use a placeholder/instructions
+      const savedEmbedUrl = localStorage.getItem('dbdiagram_embed_url') || '';
+      
+      mainContainer.innerHTML = `
+        <div class="content-header">
+          <div class="content-header-title-area">
+            <h2 class="content-header-title">Sơ đồ Database Hệ thống LMS</h2>
+            <div class="content-header-subtitle">
+              <span class="badge badge-admin">DATABASE ERD</span>
+              <span class="icon-text"><i data-lucide="database" size="14"></i> docs/db/db.md</span>
+            </div>
+          </div>
+          <div class="content-header-actions">
+            <button class="btn-secondary" onclick="copyEntireDbml(this)">
+              <i data-lucide="copy" size="16"></i> Copy toàn bộ DBML
+            </button>
+            <a href="https://dbdiagram.io" target="_blank" class="btn-secondary" style="text-decoration: none;">
+              <i data-lucide="external-link" size="16"></i> Mở dbdiagram.io
+            </a>
+          </div>
+        </div>
+        
+        <div class="tabs-bar">
+          <div class="tab-item active" id="tab-db-diagram" onclick="switchDbSchemaTab('diagram')">
+            <i data-lucide="layout" size="16"></i> Sơ đồ tương tác (dbdiagram.io)
+          </div>
+          <div class="tab-item" id="tab-db-code" onclick="switchDbSchemaTab('code')">
+            <i data-lucide="code-2" size="16"></i> Mã nguồn DBML (db.md)
+          </div>
+        </div>
+        
+        <div class="inspector-body" style="height: calc(100% - 130px); overflow-y: auto;">
+          <!-- DIAGRAM PANEL -->
+          <div id="panel-db-diagram" class="db-schema-panel active" style="height: 100%;">
+            <div style="display: flex; flex-direction: column; height: 100%; gap: 16px;">
+              
+              <!-- Link Configuration Area -->
+              <div class="card" style="padding: 16px 20px; background: rgba(22, 30, 49, 0.4);">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="settings" size="16" style="color: var(--color-secondary)"></i>
+                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Cấu hình nhúng sơ đồ từ dbdiagram.io:</span>
+                  </div>
+                  <div style="display: flex; gap: 8px; flex-grow: 1; max-width: 600px;">
+                    <input type="text" id="dbdiagram-url-input" 
+                           style="flex-grow: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; outline: none;" 
+                           placeholder="Dán link Embed (ví dụ: https://dbdiagram.io/embed/666...)" 
+                           value="${savedEmbedUrl}">
+                    <button class="filter-btn active" style="padding: 0 16px; flex: none; font-size: 0.8rem;" onclick="saveDbDiagramUrl()">Lưu & Hiển thị</button>
+                    ${savedEmbedUrl ? `<button class="filter-btn" style="padding: 0 12px; flex: none; font-size: 0.8rem; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #ef4444;" onclick="clearDbDiagramUrl()">Xóa</button>` : ''}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Embedded IFrame or Setup Instructions -->
+              <div style="flex-grow: 1; min-height: 500px; display: flex; flex-direction: column; position: relative;">
+                ${savedEmbedUrl ? `
+                  <iframe src="${savedEmbedUrl}" frameborder="0" style="width: 100%; height: 100%; min-height: 550px; border-radius: 12px; border: 1px solid var(--border-color); background: #ffffff; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);" allowfullscreen></iframe>
+                ` : `
+                  <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 48px; flex-grow: 1; border-style: dashed; border-width: 2px;">
+                    <div style="background: rgba(99, 102, 241, 0.1); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--color-primary);">
+                      <i data-lucide="file-symlink" size="32"></i>
+                    </div>
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; color: #fff;">Chưa liên kết Sơ đồ dbdiagram.io</h3>
+                    <p style="max-width: 500px; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;">
+                      Để xem sơ đồ quan hệ thực thể (ERD) tương tác trực tiếp, hãy thực hiện theo các bước đơn giản sau:
+                    </p>
+                    <div style="text-align: left; max-width: 500px; margin-bottom: 24px; font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px;">
+                      <div style="display: flex; gap: 12px;">
+                        <span style="background: var(--color-primary); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">1</span>
+                        <span>Click nút <strong>Copy toàn bộ DBML</strong> ở góc trên bên phải trang này.</span>
+                      </div>
+                      <div style="display: flex; gap: 12px;">
+                        <span style="background: var(--color-primary); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">2</span>
+                        <span>Click nút <strong>Mở dbdiagram.io</strong> để truy cập trang web, tạo sơ đồ mới và dán (Paste) mã DBML vào khung soạn thảo bên trái.</span>
+                      </div>
+                      <div style="display: flex; gap: 12px;">
+                        <span style="background: var(--color-primary); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">3</span>
+                        <span>Trên dbdiagram.io, bấm vào <strong>Publish</strong> hoặc <strong>Share</strong> ở thanh menu trên cùng, chọn tab <strong>Embed</strong> và copy URL hiển thị trong thuộc tính <code>src</code> (ví dụ: <code>https://dbdiagram.io/embed/66612...</code>).</span>
+                      </div>
+                      <div style="display: flex; gap: 12px;">
+                        <span style="background: var(--color-primary); color: #fff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0;">4</span>
+                        <span>Dán đường link vừa copy vào ô cấu hình phía trên và bấm <strong>Lưu & Hiển thị</strong>.</span>
+                      </div>
+                    </div>
+                    <button class="btn-secondary" style="background: var(--color-primary); color: #fff; border-color: var(--color-primary);" onclick="copyEntireDbml(this); window.open('https://dbdiagram.io', '_blank');">
+                      <i data-lucide="external-link" size="16"></i> Thực hiện ngay trên dbdiagram.io
+                    </button>
+                  </div>
+                `}
+              </div>
+            </div>
+          </div>
+          
+          <!-- CODE PANEL -->
+          <div id="panel-db-code" class="db-schema-panel" style="display: none;">
+            <div class="card" style="position: relative;">
+              <div style="position: absolute; right: 24px; top: 20px;">
+                <button class="btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="copyEntireDbml(this)">
+                  <i data-lucide="copy" size="14"></i> Copy DBML
+                </button>
+              </div>
+              <h4 class="card-title"><i data-lucide="code" size="18"></i> Cấu trúc DBML nguyên bản (db.md)</h4>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; margin-top: -8px;">
+                Định dạng DBML (Database Markup Language) được sử dụng để định nghĩa cấu trúc bảng và quan hệ giữa chúng, tương thích hoàn toàn với dbdiagram.io.
+              </p>
+              <pre style="background: #060913; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; overflow-x: auto; max-height: 600px;"><code id="dbml-raw-code" class="language-dbml" style="font-family: var(--font-mono); font-size: 0.85rem; color: #a5b4fc; line-height: 1.5; display: block; white-space: pre;">${escapeHtml(dbmlContent || FALLBACK_DBML)}</code></pre>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      lucide.createIcons();
+    }
+
+    // Switch between Diagram and Code tab in Database Schema view
+    function switchDbSchemaTab(tab) {
+      const diagramTab = document.getElementById('tab-db-diagram');
+      const codeTab = document.getElementById('tab-db-code');
+      const diagramPanel = document.getElementById('panel-db-diagram');
+      const codePanel = document.getElementById('panel-db-code');
+      
+      if (tab === 'diagram') {
+        diagramTab.classList.add('active');
+        codeTab.classList.remove('active');
+        diagramPanel.style.display = 'block';
+        codePanel.style.display = 'none';
+      } else {
+        diagramTab.classList.remove('active');
+        codeTab.classList.add('active');
+        diagramPanel.style.display = 'none';
+        codePanel.style.display = 'block';
+      }
+    }
+
+    // Save dbdiagram.io URL and re-render
+    function saveDbDiagramUrl() {
+      const input = document.getElementById('dbdiagram-url-input');
+      let url = input.value.trim();
+      if (!url) {
+        alert('Vui lòng nhập đường dẫn nhúng hợp lệ!');
+        return;
+      }
+      
+      // Auto-extract URL from iframe code if user pasted the whole iframe tag
+      if (url.startsWith('<iframe') || url.includes('src=')) {
+        const match = url.match(/src=["']([^"']+)["']/);
+        if (match && match[1]) {
+          url = match[1];
+        }
+      }
+      
+      // Convert normal view URL to embed URL if needed
+      // e.g. https://dbdiagram.io/d/66612beec9f78cfec7ffdfb8 -> https://dbdiagram.io/embed/66612beec9f78cfec7ffdfb8
+      if (url.includes('dbdiagram.io/d/')) {
+        url = url.replace('dbdiagram.io/d/', 'dbdiagram.io/embed/');
+      }
+      
+      localStorage.setItem('dbdiagram_embed_url', url);
+      renderDbSchemaView();
+    }
+
+    // Clear dbdiagram.io URL
+    function clearDbDiagramUrl() {
+      if (confirm('Bạn có chắc chắn muốn xóa liên kết sơ đồ đã lưu?')) {
+        localStorage.removeItem('dbdiagram_embed_url');
+        renderDbSchemaView();
+      }
+    }
+
+    // Copy entire DBML text to clipboard
+    function copyEntireDbml(btn) {
+      const textToCopy = dbmlContent || FALLBACK_DBML;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="check" style="color:var(--badge-instructor)"></i> Đã copy!';
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          lucide.createIcons();
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
