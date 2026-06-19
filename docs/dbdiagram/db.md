@@ -1,6 +1,6 @@
 // LMS Database - Online Learning Platform
 // Stack: Next.js + NestJS + PostgreSQL + Mux
-// Removed: refresh_tokens, certificates
+// Features: Global Coupons, Direct Promotions (Course/Category), Orders, Payments & Course Groups (Roadmaps)
 
 Enum user_role {
   STUDENT
@@ -41,6 +41,7 @@ Enum mux_status {
 }
 
 Enum enrollment_status {
+  PENDING_PAYMENT
   ACTIVE
   COMPLETED
   CANCELLED
@@ -57,8 +58,32 @@ Enum attempt_status {
   GRADED
 }
 
+Enum discount_type {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+Enum coupon_status {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+Enum order_status {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+Enum payment_status {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
 Table users {
-  id uuid [primary key]
+  id uuid [pk]
   full_name varchar [not null]
   email varchar [not null, unique]
   password_hash text [not null]
@@ -70,7 +95,7 @@ Table users {
 }
 
 Table instructor_requests {
-  id uuid [primary key]
+  id uuid [pk]
   user_id uuid [not null]
   status instructor_request_status [not null, default: 'PENDING']
   reason text
@@ -84,7 +109,7 @@ Table instructor_requests {
 }
 
 Table categories {
-  id uuid [primary key]
+  id uuid [pk]
   name varchar [not null]
   slug varchar [not null, unique]
   description text
@@ -92,8 +117,76 @@ Table categories {
   updated_at timestamp
 }
 
+// Bảng lưu thông tin Nhóm khóa học (Ví dụ: Nhóm mục tiêu TOEIC 450, TOEIC 650)
+Table course_groups {
+  id uuid [pk]
+   owner_id uuid [not null]
+  category_id uuid [not null]                  // Thuộc về danh mục nào (Ví dụ: Tiếng Anh)
+  title varchar [not null]                     // Tên nhóm (Ví dụ: Lộ trình mục tiêu TOEIC 450)
+  slug varchar [not null, unique]
+  description text
+  order_index integer [not null, default: 0]   // Thứ tự hiển thị của nhóm trong danh mục
+  created_at timestamp
+  updated_at timestamp
+}
+
+// Bảng trung gian định nghĩa các khóa học nằm trong nhóm nào và thứ tự học (Roadmap)
+Table course_group_items {
+  course_group_id uuid [not null]
+  course_id uuid [not null]
+  order_index integer [not null, default: 0]   // Thứ tự học của khóa học trong nhóm này (Khóa 1 -> Khóa 2)
+  
+  indexes {
+    (course_group_id, course_id) [pk]
+  }
+}
+
+Table coupons {
+  id uuid [pk]
+  code varchar [not null, unique]
+  discount_type discount_type [not null]
+  discount_value decimal(10,2) [not null]
+  start_date timestamp
+  end_date timestamp
+  usage_limit integer
+  used_count integer [default: 0]
+  status coupon_status [not null, default: 'ACTIVE']
+  created_by uuid [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table promotions {
+  id uuid [pk]
+  name varchar [not null]
+  discount_percentage decimal(5,2) [not null]
+  start_date timestamp [not null]
+  end_date timestamp [not null]
+  is_active boolean [default: true]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table promotion_courses {
+  promotion_id uuid [not null]
+  course_id uuid [not null]
+  
+  indexes {
+    (promotion_id, course_id) [pk]
+  }
+}
+
+Table promotion_categories {
+  promotion_id uuid [not null]
+  category_id uuid [not null]
+  
+  indexes {
+    (promotion_id, category_id) [pk]
+  }
+}
+
 Table courses {
-  id uuid [primary key]
+  id uuid [pk]
   instructor_id uuid [not null]
   category_id uuid
   title varchar [not null]
@@ -103,13 +196,13 @@ Table courses {
   thumbnail_url text
   level course_level [not null, default: 'BEGINNER']
   status course_status [not null, default: 'DRAFT']
-  price decimal(10,2) [default: 0]
+  price decimal(10,2) [not null, default: 0]
   created_at timestamp
   updated_at timestamp
 }
 
 Table course_sections {
-  id uuid [primary key]
+  id uuid [pk]
   course_id uuid [not null]
   title varchar [not null]
   description text
@@ -119,7 +212,7 @@ Table course_sections {
 }
 
 Table lessons {
-  id uuid [primary key]
+  id uuid [pk]
   section_id uuid [not null]
   title varchar [not null]
   content text
@@ -138,7 +231,7 @@ Table lessons {
 }
 
 Table lesson_resources {
-  id uuid [primary key]
+  id uuid [pk]
   lesson_id uuid [not null]
   file_name varchar [not null]
   file_url text [not null]
@@ -147,11 +240,38 @@ Table lesson_resources {
   created_at timestamp
 }
 
-Table enrollments {
-  id uuid [primary key]
+Table orders {
+  id uuid [pk]
   student_id uuid [not null]
   course_id uuid [not null]
-  status enrollment_status [not null, default: 'ACTIVE']
+  coupon_id uuid [null]
+  promotion_id uuid [null]
+  base_price decimal(10,2) [not null]
+  promotion_discount decimal(10,2) [default: 0]
+  coupon_discount decimal(10,2) [default: 0]
+  final_price decimal(10,2) [not null]
+  status order_status [not null, default: 'PENDING']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table payments {
+  id uuid [pk]
+  order_id uuid [not null]
+  payment_method varchar [not null]
+  transaction_reference varchar [unique]
+  amount decimal(10,2) [not null]
+  status payment_status [not null, default: 'PENDING']
+  paid_at timestamp
+  created_at timestamp
+}
+
+Table enrollments {
+  id uuid [pk]
+  student_id uuid [not null]
+  course_id uuid [not null]
+  order_id uuid [null]
+  status enrollment_status [not null, default: 'PENDING_PAYMENT']
   enrolled_at timestamp
   completed_at timestamp
 
@@ -161,7 +281,7 @@ Table enrollments {
 }
 
 Table lesson_progress {
-  id uuid [primary key]
+  id uuid [pk]
   enrollment_id uuid [not null]
   lesson_id uuid [not null]
   is_completed boolean [default: false]
@@ -175,7 +295,7 @@ Table lesson_progress {
 }
 
 Table quizzes {
-  id uuid [primary key]
+  id uuid [pk]
   course_id uuid [not null]
   lesson_id uuid
   title varchar [not null]
@@ -188,7 +308,7 @@ Table quizzes {
 }
 
 Table questions {
-  id uuid [primary key]
+  id uuid [pk]
   quiz_id uuid [not null]
   question_text text [not null]
   question_type question_type [not null]
@@ -199,7 +319,7 @@ Table questions {
 }
 
 Table question_options {
-  id uuid [primary key]
+  id uuid [pk]
   question_id uuid [not null]
   option_text text [not null]
   is_correct boolean [default: false]
@@ -207,7 +327,7 @@ Table question_options {
 }
 
 Table quiz_attempts {
-  id uuid [primary key]
+  id uuid [pk]
   quiz_id uuid [not null]
   student_id uuid [not null]
   enrollment_id uuid [not null]
@@ -220,7 +340,7 @@ Table quiz_attempts {
 }
 
 Table quiz_answers {
-  id uuid [primary key]
+  id uuid [pk]
   attempt_id uuid [not null]
   question_id uuid [not null]
   selected_option_id uuid
@@ -239,6 +359,19 @@ Table quiz_answers {
 Ref: instructor_requests.user_id > users.id
 Ref: instructor_requests.reviewed_by > users.id
 
+Ref: coupons.created_by > users.id
+
+Ref: course_groups.category_id > categories.id
+Ref: course_groups.owner_id > users.id
+Ref: course_group_items.course_group_id > course_groups.id
+Ref: course_group_items.course_id > courses.id
+
+Ref: promotion_courses.promotion_id > promotions.id
+Ref: promotion_courses.course_id > courses.id
+
+Ref: promotion_categories.promotion_id > promotions.id
+Ref: promotion_categories.category_id > categories.id
+
 Ref: courses.instructor_id > users.id
 Ref: courses.category_id > categories.id
 
@@ -248,8 +381,16 @@ Ref: lessons.section_id > course_sections.id
 
 Ref: lesson_resources.lesson_id > lessons.id
 
+Ref: orders.student_id > users.id
+Ref: orders.course_id > courses.id
+Ref: orders.coupon_id > coupons.id
+Ref: orders.promotion_id > promotions.id
+
+Ref: payments.order_id > orders.id
+
 Ref: enrollments.student_id > users.id
 Ref: enrollments.course_id > courses.id
+Ref: enrollments.order_id > orders.id
 
 Ref: lesson_progress.enrollment_id > enrollments.id
 Ref: lesson_progress.lesson_id > lessons.id
