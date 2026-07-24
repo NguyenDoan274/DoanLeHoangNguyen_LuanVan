@@ -4,4 +4,4 @@ Họ tên: Đoàn Lê Hoàng Nguyên
 
 MSSV: DH52201112
 
-Đề tài: xây dựng hệ thống quản lý khóa học trực tuyến
+Đề tài: xây dựng hệ thống học và quản lý khóa học trực tuyến

@@ -1,0 +1,196 @@
+/* ===== Instructor Portal Layout CSS ===== */
+
+.instructor-dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
+/* ── Sidebar ── */
+.instructor-sidebar {
+  width: 260px;
+  background-color: var(--surface-container-lowest);
+  border-right: 1px solid var(--outline-variant);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 50;
+}
+
+.sidebar-brand {
+  padding: 0 8px;
+  margin-bottom: 32px;
+}
+
+.sidebar-brand h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sidebar-sub {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+  margin-top: 4px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sidebar-nav-item:hover {
+  background-color: var(--surface-container-low);
+  color: var(--primary);
+}
+
+.sidebar-nav-item.active {
+  background-color: rgba(30, 64, 175, 0.1);
+  color: var(--primary);
+  border-right: 4px solid var(--primary);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 20px;
+}
+
+.logout-btn {
+  justify-content: flex-start;
+  color: var(--error);
+}
+
+.logout-btn:hover {
+  background-color: var(--error-container);
+  color: var(--error);
+}
+
+/* ── Main Panel ── */
+.instructor-main {
+  flex-grow: 1;
+  padding-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top Bar ── */
+.instructor-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 64px;
+  background-color: rgba(248, 249, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--outline-variant);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icon-btn {
+  padding: 8px;
+  border-radius: 50%;
+  color: var(--on-surface-variant);
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  background-color: var(--surface-container-high);
+  color: var(--primary);
+}
+
+.topbar-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 20px;
+  border-left: 1px solid var(--outline-variant);
+}
+
+.user-text {
+  text-align: right;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.user-role {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--on-surface-variant);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-container);
+}
+
+/* ── Footer ── */
+.dashboard-footer {
+  margin-top: auto;
+  padding: 32px 40px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--outline);
+  border-top: 1px solid var(--outline-variant);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .instructor-sidebar {
+    display: none;
+  }
+  .instructor-main {
+    padding-left: 0;
+  }
+  .instructor-topbar {
+    padding: 0 16px;
+  }
+}

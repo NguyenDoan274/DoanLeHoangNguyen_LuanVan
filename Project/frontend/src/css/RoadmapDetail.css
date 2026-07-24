@@ -1,0 +1,252 @@
+/* ===== Roadmap Detail CSS ===== */
+
+.roadmap-detail-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 40px var(--margin-desktop);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: 'Inter', sans-serif;
+  color: var(--on-background);
+}
+
+@media (max-width: 768px) {
+  .roadmap-detail-container {
+    padding: 24px var(--margin-mobile);
+  }
+}
+
+/* Breadcrumbs */
+.roadmap-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.roadmap-breadcrumbs a {
+  color: var(--on-surface-variant);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.roadmap-breadcrumbs a:hover {
+  color: var(--primary);
+}
+
+.roadmap-breadcrumbs .current {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.roadmap-breadcrumbs .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* Hero Section */
+.roadmap-hero {
+  background: linear-gradient(135deg, rgba(0, 40, 142, 0.04) 0%, rgba(78, 222, 163, 0.04) 100%);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--borderRadius-xl);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .roadmap-hero {
+    padding: 24px;
+  }
+}
+
+.roadmap-hero-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+  max-width: 800px;
+}
+
+.roadmap-hero-desc {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 700px;
+}
+
+/* Layout Grid */
+.roadmap-layout {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 32px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+@media (max-width: 1024px) {
+  .roadmap-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Course List */
+.roadmap-courses-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.roadmap-section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--on-background);
+  margin: 0;
+}
+
+.roadmap-courses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.roadmap-course-card {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--borderRadius-xl);
+  background-color: var(--surface-container-lowest);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.roadmap-course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+  border-color: var(--primary-fixed-dim);
+}
+
+.roadmap-course-img {
+  width: 180px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: var(--borderRadius);
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .roadmap-course-card {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .roadmap-course-img {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+.roadmap-course-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.roadmap-course-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--on-background);
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.roadmap-course-instructor {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+  margin: 0;
+}
+
+.roadmap-course-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.roadmap-course-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.roadmap-status-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--borderRadius);
+}
+
+.status-enrolled {
+  background-color: rgba(78, 222, 163, 0.12);
+  color: var(--on-secondary-container);
+}
+
+.status-not-enrolled {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+}
+
+/* Sidebar */
+.roadmap-sidebar {
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--borderRadius-xl);
+  background-color: var(--surface-container-lowest);
+  box-shadow: var(--shadow-modal);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 100px;
+}
+
+.roadmap-sidebar-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  border-bottom: 1px solid var(--outline-variant);
+  padding-bottom: 12px;
+}
+
+.roadmap-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.roadmap-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.roadmap-summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  border-top: 1px dashed var(--outline-variant);
+  padding-top: 16px;
+  margin-top: 4px;
+  color: var(--on-background);
+}

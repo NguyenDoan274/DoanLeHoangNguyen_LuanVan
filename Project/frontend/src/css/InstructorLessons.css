@@ -1,0 +1,283 @@
+/* ===== Instructor Lessons Management CSS ===== */
+
+.lessons-content {
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Section Context Card ── */
+.section-context-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  gap: 24px;
+}
+
+.section-context-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.section-context-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--primary-fixed);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-context-info h2 {
+  color: var(--on-surface);
+  margin-bottom: 4px;
+}
+
+/* ── Lessons List ── */
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lesson-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease-out;
+}
+
+.lesson-item:hover {
+  transform: translateX(4px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-card);
+}
+
+.lesson-item-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.lesson-index-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--surface-container-high);
+  color: var(--on-surface);
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.lesson-item-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.lesson-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.lesson-title {
+  font-weight: 600;
+  color: var(--on-surface);
+  margin-bottom: 0;
+}
+
+.badge-preview {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.lesson-desc {
+  font-size: 13px;
+  color: var(--outline);
+  margin-bottom: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.lesson-item-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+/* ── Mux Video Badges ── */
+.mux-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.mux-no-video {
+  background-color: var(--surface-container-high);
+  color: var(--outline);
+}
+
+.mux-processing {
+  background-color: rgba(255, 165, 131, 0.15);
+  color: var(--tertiary-container);
+}
+
+.mux-ready {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-container);
+}
+
+.mux-errored {
+  background-color: var(--error-container);
+  color: var(--error);
+}
+
+.video-duration {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--outline);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Custom File Input ── */
+.video-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.video-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--outline-variant);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  background-color: var(--surface-container-lowest);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.video-upload-label:hover {
+  border-color: var(--primary);
+  background-color: rgba(0, 40, 142, 0.03);
+}
+
+.video-upload-label .material-symbols-outlined {
+  font-size: 36px;
+  color: var(--outline);
+  margin-bottom: 8px;
+}
+
+.video-upload-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--on-surface-variant);
+}
+
+.video-upload-subtext {
+  font-size: 11px;
+  color: var(--outline);
+  margin-top: 4px;
+}
+
+/* ── Video Player Panel ── */
+.video-preview-panel {
+  margin-top: 16px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--outline-variant);
+  background-color: #000;
+}
+
+.video-player-frame {
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: block;
+}
+
+
+/* ── Empty State ── */
+.lessons-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.lessons-empty-icon {
+  font-size: 64px;
+  color: var(--outline-variant);
+  margin-bottom: 16px;
+}
+
+/* ── Responsive Styling ── */
+@media (max-width: 992px) {
+  .lesson-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .lesson-item-right {
+    justify-content: space-between;
+    border-top: 1px solid var(--outline-variant);
+    padding-top: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lessons-content {
+    padding: 24px 16px;
+  }
+
+  .section-context-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .section-context-left {
+    align-items: flex-start;
+  }
+}

@@ -1,0 +1,523 @@
+/* ===== Course Detail CSS ===== */
+
+.course-detail-main {
+  background-color: var(--background);
+  color: var(--on-background);
+  font-family: 'Inter', sans-serif;
+}
+
+.detail-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 40px var(--margin-desktop);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .detail-container {
+    padding: 24px var(--margin-mobile);
+  }
+}
+
+/* Breadcrumbs */
+.detail-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.detail-breadcrumbs a {
+  color: var(--on-surface-variant);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.detail-breadcrumbs a:hover {
+  color: var(--primary);
+}
+
+.detail-breadcrumbs .current {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.detail-breadcrumbs .material-symbols-outlined {
+  font-size: 16px;
+}
+
+/* Layout Grid */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Left Content Column */
+.detail-content-left {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Hero Section */
+.detail-hero-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tag {
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.tag-category {
+  background-color: rgba(0, 40, 142, 0.08);
+  color: var(--primary);
+}
+
+.tag-level {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+}
+
+.detail-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .detail-title {
+    font-size: 28px;
+  }
+}
+
+.detail-subtitle {
+  font-size: 18px;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.detail-instructor-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.instructor-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-fixed-dim);
+}
+
+.instructor-label {
+  display: block;
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.instructor-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 2px 0 0 0;
+}
+
+/* What you learn card */
+.detail-learn-section {
+  padding: 32px;
+}
+
+.section-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 20px 0;
+}
+
+.learn-benefits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .learn-benefits {
+    grid-template-columns: 1fr;
+  }
+}
+
+.learn-benefits li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.check-icon {
+  color: var(--secondary);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+/* Curriculum Accordion */
+.detail-curriculum-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.curriculum-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--surface-container-high);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-title-lg {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+.curriculum-stats {
+  font-size: 14px;
+  color: var(--on-surface-variant);
+}
+
+.curriculum-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.accordion-item {
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--surface-container-lowest);
+  transition: border-color 0.2s ease;
+}
+
+.accordion-item:hover {
+  border-color: var(--primary-fixed-dim);
+}
+
+.accordion-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--surface-container-low);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.accordion-toggle:hover {
+  background-color: var(--surface-container-high);
+}
+
+.accordion-title-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--on-surface);
+}
+
+.toggle-arrow {
+  color: var(--primary);
+  transition: transform 0.3s ease;
+  font-size: 24px;
+}
+
+.accordion-item.active .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.accordion-title-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.accordion-stats-right {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+/* Accordion transition logic */
+.accordion-content-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--surface-container-lowest);
+}
+
+.accordion-item.active .accordion-content-wrapper {
+  max-height: 1200px;
+}
+
+/* Lessons */
+.lesson-list {
+  padding: 0 20px;
+}
+
+.lesson-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.lesson-item:last-child {
+  border-bottom: none;
+}
+
+.lesson-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--on-surface);
+}
+
+.lesson-icon {
+  color: var(--on-surface-variant);
+  font-size: 20px;
+}
+
+.lesson-name {
+  font-size: 15px;
+}
+
+.lesson-right {
+  display: flex;
+  align-items: center;
+}
+
+.preview-tag {
+  background-color: rgba(0, 40, 142, 0.08);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lock-icon {
+  color: var(--outline);
+  font-size: 20px;
+}
+
+/* Detailed description */
+.detail-description-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.description-text {
+  font-size: 16px;
+  color: var(--on-surface-variant);
+  line-height: 1.7;
+}
+
+.description-text p {
+  margin-bottom: 16px;
+}
+
+.description-text strong {
+  color: var(--on-surface);
+}
+
+/* Right Sticky Sidebar Column */
+.detail-sidebar-container {
+  position: sticky;
+  top: 100px;
+  z-index: 20;
+}
+
+.detail-sidebar {
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background-color: var(--surface-container-lowest);
+  box-shadow: var(--shadow-modal);
+}
+
+.sidebar-thumbnail-wrapper {
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--surface-container-high);
+}
+
+.sidebar-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.detail-sidebar:hover .sidebar-thumbnail {
+  transform: scale(1.05);
+}
+
+.sidebar-price-info {
+  padding: 24px 24px 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-container {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.price-current {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--secondary);
+}
+
+
+.sidebar-actions {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.btn-checkout {
+  height: 52px;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.btn-cart {
+  height: 52px;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sidebar-coupon {
+  padding: 0 24px 24px 24px;
+  border-top: 1px solid var(--outline-variant);
+  margin-top: 8px;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coupon-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+
+.coupon-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.coupon-input {
+  flex-grow: 1;
+  background-color: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  padding: 0 16px;
+  font-size: 14px;
+  height: 44px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.coupon-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 40, 142, 0.15);
+}
+
+.btn-apply {
+  background-color: var(--surface-container-high);
+  color: var(--primary);
+  font-weight: 700;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  height: 44px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-apply:hover {
+  background-color: var(--outline-variant);
+}
+
+/* Utilities */
+.loading-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  color: var(--on-surface-variant);
+}
+
+.empty-curriculum {
+  padding: 40px;
+  text-align: center;
+  border: 1.5px dashed var(--outline-variant);
+  border-radius: var(--radius-lg);
+  color: var(--on-surface-variant);
+}
+

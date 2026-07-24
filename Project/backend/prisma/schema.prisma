@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  id                   String                 @id @db.Uuid
+  name                 String                 @db.VarChar
+  description          String?
+  created_at           DateTime?              @db.Timestamp(6)
+  updated_at           DateTime?              @db.Timestamp(6)
+  course_groups        course_groups[]
+  courses              courses[]
+  promotion_categories promotion_categories[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model coupons {
+  id                  String        @id @db.Uuid
+  code                String        @unique @db.VarChar
+  discount_percentage Decimal       @db.Decimal(5, 2)
+  start_date          DateTime?     @db.Timestamp(6)
+  end_date            DateTime?     @db.Timestamp(6)
+  usage_limit         Int?
+  used_count          Int?          @default(0)
+  status              coupon_status @default(ACTIVE)
+  created_by          String        @db.Uuid
+  created_at          DateTime?     @db.Timestamp(6)
+  updated_at          DateTime?     @db.Timestamp(6)
+  users               users         @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders              orders[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model course_group_items {
+  course_group_id String        @db.Uuid
+  course_id       String        @db.Uuid
+  order_index     Int           @default(0)
+  is_required     Boolean       @default(true)
+  course_groups   course_groups @relation(fields: [course_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  courses         courses       @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([course_group_id, course_id])
+  @@index([course_group_id, order_index])
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model course_groups {
+  id                 String               @id @db.Uuid
+  owner_id           String               @db.Uuid
+  category_id        String               @db.Uuid
+  title              String               @db.VarChar
+  description        String?
+  order_index        Int                  @default(0)
+  created_at         DateTime?            @db.Timestamp(6)
+  updated_at         DateTime?            @db.Timestamp(6)
+  course_group_items course_group_items[]
+  categories         categories           @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users              users                @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model course_sections {
+  id          String    @id @db.Uuid
+  course_id   String    @db.Uuid
+  title       String    @db.VarChar
+  description String?
+  order_index Int
+  created_at  DateTime? @db.Timestamp(6)
+  updated_at  DateTime? @db.Timestamp(6)
+  courses     courses   @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lessons     lessons[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model courses {
+  id                 String               @id @db.Uuid
+  instructor_id      String               @db.Uuid
+  category_id        String               @db.Uuid
+  title              String               @db.VarChar
+  short_description  String?
+  description        String?
+  thumbnail_url      String?
+  level              course_level         @default(BEGINNER)
+  status             course_status        @default(DRAFT)
+  price              Decimal              @default(0) @db.Decimal(10, 2)
+  is_recommend       Boolean              @default(false)
+  created_at         DateTime?            @db.Timestamp(6)
+  updated_at         DateTime?            @db.Timestamp(6)
+  course_group_items course_group_items[]
+  course_sections    course_sections[]
+  categories         categories           @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users              users                @relation(fields: [instructor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  enrollments        enrollments[]
+  order_items        order_items[]
+  promotion_courses  promotion_courses[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model enrollments {
+  id              String            @id @db.Uuid
+  student_id      String            @db.Uuid
+  course_id       String            @db.Uuid
+  order_item_id   String?           @db.Uuid
+  status          enrollment_status @default(ACTIVE)
+  enrolled_at     DateTime?         @db.Timestamp(6)
+  completed_at    DateTime?         @db.Timestamp(6)
+  courses         courses           @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order_items     order_items?      @relation(fields: [order_item_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users             @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([student_id, course_id], map: "enrollments_student_id_course_id_idx")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model lessons {
+  id               String             @id @db.Uuid
+  section_id       String             @db.Uuid
+  title            String             @db.VarChar
+  content          String?
+  order_index      Int
+  is_preview       Boolean?           @default(false)
+  mux_upload_id    String?            @db.VarChar
+  mux_asset_id     String?            @db.VarChar
+  mux_playback_id  String?            @db.VarChar
+  mux_status       mux_status?        @default(NO_VIDEO)
+  duration_sec     Int?
+  created_at       DateTime?          @db.Timestamp(6)
+  updated_at       DateTime?          @db.Timestamp(6)
+  course_sections  course_sections    @relation(fields: [section_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model order_items {
+  id                 String        @id @db.Uuid
+  order_id           String        @db.Uuid
+  course_id          String        @db.Uuid
+  base_price         Decimal       @db.Decimal(10, 2)
+  promotion_id       String?       @db.Uuid
+  promotion_discount Decimal?      @default(0) @db.Decimal(10, 2)
+  final_price        Decimal       @db.Decimal(10, 2)
+  enrollments        enrollments[]
+  courses            courses       @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders             orders        @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promotions         promotions?   @relation(fields: [promotion_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([order_id, course_id], map: "order_items_order_id_course_id_idx")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model orders {
+  id                 String        @id @db.Uuid
+  student_id         String        @db.Uuid
+  coupon_id          String?       @db.Uuid
+  base_price         Decimal       @db.Decimal(10, 2)
+  promotion_discount Decimal?      @default(0) @db.Decimal(10, 2)
+  coupon_discount    Decimal?      @default(0) @db.Decimal(10, 2)
+  final_price        Decimal       @db.Decimal(10, 2)
+  status             order_status  @default(PENDING)
+  created_at         DateTime?     @db.Timestamp(6)
+  updated_at         DateTime?     @db.Timestamp(6)
+  order_items        order_items[]
+  coupons            coupons?      @relation(fields: [coupon_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users              users         @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payments           payments[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model payments {
+  id                    String         @id @db.Uuid
+  order_id              String         @db.Uuid
+  payment_method        String         @db.VarChar
+  transaction_reference String?        @unique @db.VarChar
+  amount                Decimal        @db.Decimal(10, 2)
+  status                payment_status @default(PENDING)
+  paid_at               DateTime?      @db.Timestamp(6)
+  created_at            DateTime?      @db.Timestamp(6)
+  orders                orders         @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model promotion_categories {
+  promotion_id String     @db.Uuid
+  category_id  String     @db.Uuid
+  categories   categories @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promotions   promotions @relation(fields: [promotion_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([promotion_id, category_id])
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model promotion_courses {
+  promotion_id String     @db.Uuid
+  course_id    String     @db.Uuid
+  courses      courses    @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promotions   promotions @relation(fields: [promotion_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([promotion_id, course_id])
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model promotions {
+  id                   String                 @id @db.Uuid
+  name                 String                 @db.VarChar
+  discount_percentage  Decimal                @db.Decimal(5, 2)
+  start_date           DateTime               @db.Timestamp(6)
+  end_date             DateTime               @db.Timestamp(6)
+  is_active            Boolean?               @default(true)
+  created_by           String                 @db.Uuid
+  created_at           DateTime?              @db.Timestamp(6)
+  updated_at           DateTime?              @db.Timestamp(6)
+  order_items          order_items[]
+  promotion_categories promotion_categories[]
+  promotion_courses    promotion_courses[]
+  users                users                  @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id            String          @id @db.Uuid
+  full_name     String          @db.VarChar
+  email         String          @unique @db.VarChar
+  password_hash String
+  avatar_url    String?
+  role          user_role       @default(STUDENT)
+  status        user_status     @default(ACTIVE)
+  created_at    DateTime?       @db.Timestamp(6)
+  updated_at    DateTime?       @db.Timestamp(6)
+  coupons       coupons[]
+  course_groups course_groups[]
+  courses       courses[]
+  enrollments   enrollments[]
+  orders        orders[]
+  promotions    promotions[]
+}
+
+enum coupon_status {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+enum course_level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum course_status {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+enum enrollment_status {
+  ACTIVE
+  CANCELLED
+}
+
+enum mux_status {
+  NO_VIDEO
+  PROCESSING
+  READY
+  ERRORED
+}
+
+enum order_status {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum payment_status {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum user_role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum user_status {
+  ACTIVE
+  INACTIVE
+  BANNED
+}

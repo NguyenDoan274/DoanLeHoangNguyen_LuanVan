@@ -1,0 +1,37 @@
+/* ===== Roadmap Explorer CSS ===== */
+
+.roadmap-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 12px 0 24px;
+}
+
+.roadmap-step-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(30, 64, 175, 0.08);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

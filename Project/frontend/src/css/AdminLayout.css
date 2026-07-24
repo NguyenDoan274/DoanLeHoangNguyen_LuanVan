@@ -1,0 +1,183 @@
+/* ===== Admin Console Layout CSS ===== */
+
+.admin-dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
+/* ── Sidebar ── */
+.admin-sidenav {
+  width: 260px;
+  background-color: var(--surface-container-low);
+  border-right: 1px solid var(--outline-variant);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 50;
+}
+
+.sidenav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.brand-logo-wrapper {
+  width: 32px;
+  height: 32px;
+  background-color: var(--primary);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidenav-role {
+  font-size: 11px;
+  color: var(--on-surface-variant);
+  font-weight: 600;
+}
+
+.sidenav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.sidenav-link-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  color: var(--on-surface-variant);
+  transition: all 0.2s ease;
+}
+
+.sidenav-link-item:hover {
+  background-color: var(--surface-container-high);
+  color: var(--primary);
+}
+
+.sidenav-link-item.active {
+  background-color: rgba(30, 64, 175, 0.1);
+  color: var(--primary);
+  border-right: 4px solid var(--primary);
+  font-weight: 600;
+}
+
+.sidenav-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 20px;
+}
+
+.logout-btn {
+  justify-content: flex-start;
+  color: var(--error);
+  cursor: pointer;
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background-color: var(--error-container);
+  color: var(--error);
+}
+
+/* ── Main Content Area ── */
+.admin-main {
+  flex-grow: 1;
+  padding-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top Bar ── */
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 64px;
+  background-color: var(--surface-container-lowest);
+  border-bottom: 1px solid var(--outline-variant);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 20px;
+  border-left: 1px solid var(--outline-variant);
+}
+
+.profile-text {
+  text-align: right;
+}
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.profile-role {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--on-surface-variant);
+}
+
+.profile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-container);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .admin-sidenav {
+    display: none;
+  }
+  .admin-main {
+    padding-left: 0;
+  }
+  .admin-topbar {
+    padding: 0 16px;
+  }
+}
