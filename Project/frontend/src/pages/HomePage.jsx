@@ -73,11 +73,11 @@ export default function LandingPage() {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
-        // Fetch categories
         const catRes = await fetch(API_BASE + '/api/categories');
         const catJson = await catRes.json();
         if (catRes.ok && catJson.data) {
-          const mappedCategories = catJson.data.map((item) => ({
+          const rootCategories = catJson.data.filter((item) => !item.parent_id);
+          const mappedCategories = rootCategories.map((item) => ({
             id: item.id,
             title: item.name,
             description: item.description || ''

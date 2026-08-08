@@ -19,7 +19,9 @@ import AdminPromotions from './pages/AdminPromotions';
 import AdminOrders from './pages/AdminOrders';
 import AdminPayments from './pages/AdminPayments';
 import AdminEnrollments from './pages/AdminEnrollments';
+import AdminRevenue from './pages/AdminRevenue';
 import InstructorEnrollments from './pages/InstructorEnrollments';
+import InstructorRevenue from './pages/InstructorRevenue';
 import CourseExplorer from './pages/CourseExplorer';
 import CourseDetail from './pages/CourseDetail';
 import Order from './pages/Order';
@@ -57,6 +59,7 @@ function App() {
         <Route path="/instructor/courses/:courseId/sections/:sectionId/lessons" element={<InstructorLessons />} />
         <Route path="/instructor/course-groups" element={<InstructorCourseGroups />} />
         <Route path="/instructor/students" element={<InstructorEnrollments />} />
+        <Route path="/instructor/revenue" element={<InstructorRevenue />} />
         <Route path="/instructor/profile" element={<ProfilePage />} />
       </Route>
 
@@ -71,6 +74,7 @@ function App() {
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/admin/payments" element={<AdminPayments />} />
         <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+        <Route path="/admin/revenue" element={<AdminRevenue />} />
         <Route path="/admin/profile" element={<ProfilePage />} />
       </Route>
     </Routes>

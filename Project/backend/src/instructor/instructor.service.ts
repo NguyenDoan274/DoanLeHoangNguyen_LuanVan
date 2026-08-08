@@ -58,9 +58,25 @@ export class InstructorService {
       },
       select: {
         final_price: true,
+        orders: {
+          select: {
+            coupons: {
+              select: {
+                discount_percentage: true,
+              },
+            },
+          },
+        },
       },
     });
-    const totalRevenue = paidOrderItems.reduce((sum, item) => sum + Number(item.final_price), 0);
+
+    const totalRevenue = paidOrderItems.reduce((sum, item) => {
+      const itemPrice = Number(item.final_price);
+      const discountPercentage = item.orders?.coupons?.discount_percentage
+        ? Number(item.orders.coupons.discount_percentage)
+        : 0;
+      return sum + itemPrice * (1 - discountPercentage / 100);
+    }, 0);
 
     // 6. Course-by-course statistics
     const courses = await this.prisma.courses.findMany({
@@ -88,6 +104,15 @@ export class InstructorService {
           },
           select: {
             final_price: true,
+            orders: {
+              select: {
+                coupons: {
+                  select: {
+                    discount_percentage: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -95,7 +120,13 @@ export class InstructorService {
 
     const courseStats = courses.map((course) => {
       const studentCount = course.enrollments.length;
-      const revenue = course.order_items.reduce((sum, item) => sum + Number(item.final_price), 0);
+      const revenue = course.order_items.reduce((sum, item) => {
+        const itemPrice = Number(item.final_price);
+        const discountPercentage = item.orders?.coupons?.discount_percentage
+          ? Number(item.orders.coupons.discount_percentage)
+          : 0;
+        return sum + itemPrice * (1 - discountPercentage / 100);
+      }, 0);
       return {
         id: course.id,
         title: course.title,

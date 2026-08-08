@@ -11,11 +11,16 @@ model categories {
   id                   String                 @id @db.Uuid
   name                 String                 @db.VarChar
   description          String?
+  parent_id            String?                @db.Uuid
   created_at           DateTime?              @db.Timestamp(6)
   updated_at           DateTime?              @db.Timestamp(6)
+  parent               categories?            @relation("CategoryHierarchy", fields: [parent_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  children             categories[]           @relation("CategoryHierarchy")
   course_groups        course_groups[]
   courses              courses[]
   promotion_categories promotion_categories[]
+
+  @@index([parent_id])
 }
 
 /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.

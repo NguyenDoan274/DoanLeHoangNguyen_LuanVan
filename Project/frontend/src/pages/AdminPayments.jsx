@@ -88,7 +88,7 @@ export default function AdminPayments() {
       {/* Management Header */}
       <div className="management-header">
         <div className="header-text">
-          <h1 className="font-headline-lg">Thanh Toán &amp; Doanh Thu</h1>
+          <h1 className="font-headline-lg">Thanh Toán</h1>
           <p className="font-body-md text-muted">Xem số liệu thống kê doanh thu bán hàng và nhật ký lịch sử thanh toán của hệ thống.</p>
         </div>
         <div className="header-filters">

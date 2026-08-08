@@ -53,14 +53,22 @@ export default function CourseExplorer() {
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedCategoryIds, setExpandedCategoryIds] = useState([]);
+
+  const toggleExpandCategory = (catId, e) => {
+    if (e) e.stopPropagation();
+    setExpandedCategoryIds(prev =>
+      prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
+    );
+  };
 
   const defaultCourseImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDsheivi6ETPg3bv7gNdyuu_N1OEUmjaFk9ASWbnfWWKiJg9pj9UmXwEWoZvBkHbW6jQiV3DIAVc-AamxUdQtTgzfHQhHGqxJZH-E6br1CsEavmMNKQ4XTBwmKczcf1nExnwbiwIM_5ISbzR9ZZiC8fYvzQlODVBwArN65ogNVXuaZVsNkKa8RDwtEt97J0nbT__-arHKmE6m5__W5jAwIROOtwMbOC4cnqSCyzzpg3FbG9J0WFVLMtOdPQEyhFmSC6-rgzBYnGYV0';
 
-    const levelLabels = {
-  BEGINNER: 'Mới bắt đâu',
-  INTERMEDIATE: 'Trung cấp',
-  ADVANCED: 'Nâng cao',
-};
+  const levelLabels = {
+    BEGINNER: 'Mới bắt đâu',
+    INTERMEDIATE: 'Trung cấp',
+    ADVANCED: 'Nâng cao',
+  };
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -104,11 +112,17 @@ export default function CourseExplorer() {
     } finally {
       setLoading(false);
     }
-  };  const handleLevelChange = (level) => {
+  }; const handleLevelChange = (level) => {
     setSelectedLevels(prev => ({
       ...prev,
       [level]: !prev[level]
     }));
+  };
+
+  const getValidCategoryIds = (catId) => {
+    if (catId === 'All') return [];
+    const subCategoryIds = categories.filter(c => c.parent_id === catId).map(c => c.id);
+    return [catId, ...subCategoryIds];
   };
 
   // Filter courses
@@ -120,10 +134,11 @@ export default function CourseExplorer() {
       course.users?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
 
-    // Category filter
+    // Category filter (includes sub-categories if root category selected)
+    const validCatIds = getValidCategoryIds(selectedCategory);
     const matchesCategory = selectedCategory === 'All'
       ? true
-      : course.category_id === selectedCategory;
+      : validCatIds.includes(course.category_id);
 
     // Level filter
     const activeLevels = Object.keys(selectedLevels).filter(k => selectedLevels[k]);
@@ -167,7 +182,8 @@ export default function CourseExplorer() {
 
   const getCategoryCount = (catId) => {
     if (catId === 'All') return courses.length;
-    return courses.filter(c => c.category_id === catId).length;
+    const validCatIds = getValidCategoryIds(catId);
+    return courses.filter(c => validCatIds.includes(c.category_id)).length;
   };
 
   const handleEnrollOrOrder = async (course) => {
@@ -192,7 +208,7 @@ export default function CourseExplorer() {
           },
           body: JSON.stringify({ course_id: course.id })
         });
-        
+
         const data = await res.json();
         if (res.ok) {
           alert('Đăng ký khóa học thành công!');
@@ -248,43 +264,87 @@ export default function CourseExplorer() {
                       <span className="category-count">{getCategoryCount('All')}</span>
                     </div>
                   </li>
-                  {categories.map(cat => (
-                    <li key={cat.id}>
-                      <div
-                        className={`category-filter-item ${selectedCategory === cat.id ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(cat.id)}
-                      >
-                        <span>{cat.name}</span>
-                        <span className="category-count">{getCategoryCount(cat.id)}</span>
-                      </div>
-                    </li>
-                  ))}
+                  {categories.filter(c => !c.parent_id).map(rootCat => {
+                    const subCats = categories.filter(c => c.parent_id === rootCat.id);
+                    const isExpanded = expandedCategoryIds.includes(rootCat.id) || selectedCategory === rootCat.id || subCats.some(sc => sc.id === selectedCategory);
+
+                    return (
+                      <li key={rootCat.id} style={{ marginBottom: 4 }}>
+                        <div
+                          className={`category-filter-item ${selectedCategory === rootCat.id ? 'active' : ''}`}
+                          onClick={() => {
+                            setSelectedCategory(rootCat.id);
+                            if (subCats.length > 0) {
+                              setExpandedCategoryIds(prev =>
+                                prev.includes(rootCat.id) ? prev : [...prev, rootCat.id]
+                              );
+                            }
+                          }}
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                        >
+                          <span>{rootCat.name}</span>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span className="category-count">{getCategoryCount(rootCat.id)}</span>
+                            {subCats.length > 0 && (
+                              <span
+                                className="material-symbols-outlined"
+                                style={{ fontSize: 18, color: 'var(--outline)', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                onClick={(e) => toggleExpandCategory(rootCat.id, e)}
+                              >
+                                {isExpanded ? 'expand_more' : 'chevron_right'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {subCats.length > 0 && isExpanded && (
+                          <ul className="animate-fade-in" style={{ listStyle: 'none', paddingLeft: 14, margin: '2px 0 6px 0' }}>
+                            {subCats.map(subCat => (
+                              <li key={subCat.id}>
+                                <div
+                                  className={`category-filter-item ${selectedCategory === subCat.id ? 'active' : ''}`}
+                                  onClick={() => setSelectedCategory(subCat.id)}
+                                  style={{ fontSize: 13, padding: '4px 8px' }}
+                                >
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: 'var(--outline)' }}></span>
+                                    {subCat.name}
+                                  </span>
+                                  <span className="category-count">{getCategoryCount(subCat.id)}</span>
+                                </div>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
 
               {/* Levels section */}
               <div>
-  <h3 className="filter-section-title">Cấp độ</h3>
+                <h3 className="filter-section-title">Cấp độ</h3>
 
-  <div className="checkbox-group">
-    {['BEGINNER', 'INTERMEDIATE', 'ADVANCED'].map((level) => (
-      <label
-        key={level}
-        className={`filter-label ${
-          selectedLevels[level] ? 'active' : ''
-        }`}
-      >
-        <input
-          type="checkbox"
-          checked={selectedLevels[level]}
-          onChange={() => handleLevelChange(level)}
-        />
+                <div className="checkbox-group">
+                  {['BEGINNER', 'INTERMEDIATE', 'ADVANCED'].map((level) => (
+                    <label
+                      key={level}
+                      className={`filter-label ${selectedLevels[level] ? 'active' : ''
+                        }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedLevels[level]}
+                        onChange={() => handleLevelChange(level)}
+                      />
 
-        <span>{levelLabels[level]}</span>
-      </label>
-    ))}
-  </div>
-</div>
+                      <span>{levelLabels[level]}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
 
               {/* Price section */}
               <div>
@@ -347,107 +407,84 @@ export default function CourseExplorer() {
               ) : (
                 <>
                   <div className="explorer-grid">
-                  {currentCourses.map((course) => (
-                    <Link key={course.id} to={`/courses/${course.id}`} className="explorer-card">
-                      <div className="card-image-wrapper">
-                        <div className="level-tag">
-                          {course.level === 'ADVANCED' ? 'Nâng cao' : course.level === 'INTERMEDIATE' ? 'Trung cấp' : 'Mới bắt đầu' || 'Mới bắt đầu'}
+                    {currentCourses.map((course) => (
+                      <Link key={course.id} to={`/courses/${course.id}`} className="explorer-card">
+                        <div className="card-image-wrapper">
+                          <div className="level-tag">
+                            {course.level === 'ADVANCED' ? 'Nâng cao' : course.level === 'INTERMEDIATE' ? 'Trung cấp' : 'Mới bắt đầu' || 'Mới bắt đầu'}
+                          </div>
+                          <img
+                            className="card-image"
+                            src={getCourseImage(course)}
+                            alt={course.title}
+                          />
                         </div>
-                        <img
-                          className="card-image"
-                          src={getCourseImage(course)}
-                          alt={course.title}
-                        />
-                      </div>
-                      <div className="card-content">
-                        <h3 className="card-title">{course.title}</h3>
-                        <p className="card-instructor">By {course.users?.full_name || 'Expert Instructor'}</p>
-                        <div className="card-footer">
-                          {!enrolledCourseIds.includes(course.id) && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                              {parseFloat(course.price || 0) === 0 ? (
-                                <span className="card-price" style={{ color: '#035c04ff', fontWeight: 700 }}>
-                                  Miễn phí
-                                </span>
-                              ) : course.discount_percentage && course.discount_percentage > 0 ? (
-                                <>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span className="card-price" style={{ color: '#035c04ff', fontWeight: 700 }}>
-                                      {parseFloat(course.discounted_price).toLocaleString('vi-VN')} đ
+                        <div className="card-content">
+                          <h3 className="card-title">{course.title}</h3>
+                          <p className="card-instructor">By {course.users?.full_name || 'Expert Instructor'}</p>
+                          <div className="card-footer">
+                            {!enrolledCourseIds.includes(course.id) && (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                {parseFloat(course.price || 0) === 0 ? (
+                                  <span className="card-price" style={{ color: '#035c04ff', fontWeight: 700 }}>
+                                    Miễn phí
+                                  </span>
+                                ) : course.discount_percentage && course.discount_percentage > 0 ? (
+                                  <>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <span className="card-price" style={{ color: '#035c04ff', fontWeight: 700 }}>
+                                        {parseFloat(course.discounted_price).toLocaleString('vi-VN')} đ
+                                      </span>
+                                      <span style={{
+                                        fontSize: '11px',
+                                        fontWeight: 700,
+                                        color: 'white',
+                                        backgroundColor: 'var(--error, #ba1a1a)',
+                                        padding: '2px 6px',
+                                        borderRadius: '4px'
+                                      }}>
+                                        -{course.discount_percentage}%
+                                      </span>
+                                    </div>
+                                    <span style={{ fontSize: '13px', color: 'var(--outline)', textDecoration: 'line-through' }}>
+                                      {parseFloat(course.price).toLocaleString('vi-VN')} đ
                                     </span>
-                                    <span style={{
-                                      fontSize: '11px',
-                                      fontWeight: 700,
-                                      color: 'white',
-                                      backgroundColor: 'var(--error, #ba1a1a)',
-                                      padding: '2px 6px',
-                                      borderRadius: '4px'
-                                    }}>
-                                      -{course.discount_percentage}%
-                                    </span>
-                                  </div>
-                                  <span style={{ fontSize: '13px', color: 'var(--outline)', textDecoration: 'line-through' }}>
+                                  </>
+                                ) : (
+                                  <span className="card-price" style={{ color: 'var(--primary)' }}>
                                     {parseFloat(course.price).toLocaleString('vi-VN')} đ
                                   </span>
-                                </>
-                              ) : (
-                                <span className="card-price" style={{ color: 'var(--primary)' }}>
-                                  {parseFloat(course.price).toLocaleString('vi-VN')} đ
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          <button 
+                                )}
+                              </div>
+                            )}
+                            <button
 
-                            className="enroll-btn"
-                            disabled={enrollingCourseId === course.id}
-                            onClick={(e) => {
-                              if (!enrolledCourseIds.includes(course.id)) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleEnrollOrOrder(course);
-                              }
-                            }}
-                          >
-                            {enrolledCourseIds.includes(course.id) 
-                              ? 'Đã đăng ký' 
-                              : (enrollingCourseId === course.id ? 'Đang đăng ký...' : 'Đăng Ký')}
-                          </button>
+                              className="enroll-btn"
+                              disabled={enrollingCourseId === course.id}
+                              onClick={(e) => {
+                                if (!enrolledCourseIds.includes(course.id)) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleEnrollOrOrder(course);
+                                }
+                              }}
+                            >
+                              {enrolledCourseIds.includes(course.id)
+                                ? 'Đã đăng ký'
+                                : (enrollingCourseId === course.id ? 'Đang đăng ký...' : 'Đăng Ký')}
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                      </Link>
+                    ))}
+                  </div>
 
-                {totalPages > 1 && (
-                  <div className="pagination-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="pagination-btn"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        border: '1px solid var(--outline-variant, #e5e7eb)',
-                        backgroundColor: 'white',
-                        color: currentPage === 1 ? '#9ca3af' : 'var(--primary, #2563eb)',
-                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        opacity: currentPage === 1 ? 0.6 : 1
-                      }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_left</span>
-                    </button>
-
-                    {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
+                  {totalPages > 1 && (
+                    <div className="pagination-wrapper" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '40px' }}>
                       <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="pagination-btn"
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -455,45 +492,68 @@ export default function CourseExplorer() {
                           width: '36px',
                           height: '36px',
                           borderRadius: '50%',
-                          border: '1px solid',
-                          borderColor: currentPage === page ? 'var(--primary, #2563eb)' : '#e5e7eb',
-                          backgroundColor: currentPage === page ? 'var(--primary, #2563eb)' : 'white',
-                          color: currentPage === page ? 'white' : '#374151',
-                          fontWeight: 600,
-                          fontSize: '14px',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease'
+                          border: '1px solid var(--outline-variant, #e5e7eb)',
+                          backgroundColor: 'white',
+                          color: currentPage === 1 ? '#9ca3af' : 'var(--primary, #2563eb)',
+                          cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s ease',
+                          opacity: currentPage === 1 ? 0.6 : 1
                         }}
                       >
-                        {page}
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_left</span>
                       </button>
-                    ))}
 
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="pagination-btn"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        border: '1px solid var(--outline-variant, #e5e7eb)',
-                        backgroundColor: 'white',
-                        color: currentPage === totalPages ? '#9ca3af' : 'var(--primary, #2563eb)',
-                        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                        transition: 'all 0.2s ease',
-                        opacity: currentPage === totalPages ? 0.6 : 1
-                      }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_right</span>
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
+                      {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`pagination-btn ${currentPage === page ? 'active' : ''}`}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            border: '1px solid',
+                            borderColor: currentPage === page ? 'var(--primary, #2563eb)' : '#e5e7eb',
+                            backgroundColor: currentPage === page ? 'var(--primary, #2563eb)' : 'white',
+                            color: currentPage === page ? 'white' : '#374151',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {page}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="pagination-btn"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '50%',
+                          border: '1px solid var(--outline-variant, #e5e7eb)',
+                          backgroundColor: 'white',
+                          color: currentPage === totalPages ? '#9ca3af' : 'var(--primary, #2563eb)',
+                          cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.2s ease',
+                          opacity: currentPage === totalPages ? 0.6 : 1
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_right</span>
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -513,8 +573,8 @@ export default function CourseExplorer() {
               <button className="modal-btn modal-btn-cancel" onClick={() => setShowLoginModal(false)}>
                 Đóng
               </button>
-              <button 
-                className="modal-btn modal-btn-confirm" 
+              <button
+                className="modal-btn modal-btn-confirm"
                 onClick={() => {
                   setShowLoginModal(false);
                   navigate('/login');

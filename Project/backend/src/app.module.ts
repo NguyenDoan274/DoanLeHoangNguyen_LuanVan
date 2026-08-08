@@ -23,6 +23,7 @@ import { AdminEnrollmentModule } from './admin/enrollment/enrollment.module';
 import { InstructorModule } from './instructor/instructor.module';
 import { AdminOrderModule } from './admin/order/order.module';
 import { AdminPaymentModule } from './admin/payment/payment.module';
+import { RevenueModule } from './revenue/revenue.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AdminPaymentModule } from './admin/payment/payment.module';
     }),
     AuthModule,
     AdminModule,
+    RevenueModule,
     AdminEnrollmentModule,
     AdminOrderModule,
     AdminPaymentModule,

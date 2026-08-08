@@ -73,9 +73,26 @@ export default function CourseEditModal({
                 required
               >
                 <option value="">Chọn danh mục</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
+                {categories.filter(c => !c.parent_id).map((rootCat) => {
+                  const subCats = categories.filter(c => c.parent_id === rootCat.id);
+                  if (subCats.length === 0) {
+                    return (
+                      <option key={rootCat.id} value={rootCat.id}>
+                         {rootCat.name}
+                      </option>
+                    );
+                  }
+                  return (
+                    <optgroup key={rootCat.id} label={` ${rootCat.name}`}>
+                      <option value={rootCat.id}>{rootCat.name} (Tất cả / Chung)</option>
+                      {subCats.map((subCat) => (
+                        <option key={subCat.id} value={subCat.id}>
+                          -- {subCat.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
               </select>
             </div>
 

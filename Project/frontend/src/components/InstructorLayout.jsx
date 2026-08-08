@@ -78,6 +78,10 @@ export default function InstructorLayout() {
             <span className="material-symbols-outlined">group</span>
             <span>Học Viên</span>
           </Link>
+          <Link to="/instructor/revenue" className={`sidebar-nav-item ${isActive('/instructor/revenue') ? 'active' : ''}`}>
+            <span className="material-symbols-outlined">trending_up</span>
+            <span>Doanh Thu</span>
+          </Link>
           <Link to="/instructor/profile" className={`sidebar-nav-item ${isActive('/instructor/profile') ? 'active' : ''}`}>
             <span className="material-symbols-outlined">settings</span>
             <span>Tài Khoản</span>
@@ -103,6 +107,7 @@ export default function InstructorLayout() {
               {location.pathname.includes('/lessons') && 'Quản lý bài học'}
               {isActive('/instructor/course-groups') && 'Nhóm khóa học'}
               {isActive('/instructor/students') && 'Học Viên'}
+              {isActive('/instructor/revenue') && 'Doanh Thu'}
               {isActive('/instructor/profile') && 'Tài Khoản'}
             </h2>
           </div>

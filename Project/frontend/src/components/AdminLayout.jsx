@@ -104,6 +104,10 @@ export default function AdminLayout() {
             <span className="material-symbols-outlined">school</span>
             <span className="font-label-md">Quản lý đăng ký học</span>
           </Link>
+          <Link to="/admin/revenue" className={`sidenav-link-item ${isActive('/admin/revenue') ? 'active' : ''}`}>
+            <span className="material-symbols-outlined">trending_up</span>
+            <span className="font-label-md">Quản lý doanh thu</span>
+          </Link>
           <Link to="/admin/profile" className={`sidenav-link-item ${isActive('/admin/profile') ? 'active' : ''}`}>
             <span className="material-symbols-outlined">settings</span>
             <span className="font-label-md">Tài khoản</span>

@@ -11,7 +11,7 @@ export default function AdminCategories() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', description: '', parent_id: '' });
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState({ type: '', message: '' });
 
@@ -45,7 +45,7 @@ export default function AdminCategories() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '', description: '', parent_id: '' });
     setEditingCategory(null);
   };
 
@@ -58,7 +58,8 @@ export default function AdminCategories() {
     setEditingCategory(cat);
     setFormData({
       name: cat.name || '',
-      description: cat.description || ''
+      description: cat.description || '',
+      parent_id: cat.parent_id || ''
     });
     setShowCreateModal(true);
   };
@@ -71,10 +72,17 @@ export default function AdminCategories() {
         ? `${API_BASE}/api/admin/categories/${editingCategory.id}`
         : `${API_BASE}/api/admin/categories`;
       const method = editingCategory ? 'PATCH' : 'POST';
+
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        parent_id: formData.parent_id || null
+      };
+
       const res = await fetch(url, {
         method,
         headers: authHeaders(),
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
       const json = await res.json();
       if (res.ok) {
@@ -113,7 +121,8 @@ export default function AdminCategories() {
 
   const filteredCategories = categories.filter(c =>
     c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    c.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.parent?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -129,7 +138,7 @@ export default function AdminCategories() {
       <div className="management-header">
         <div className="header-text">
           <h1 className="font-headline-lg">Quản lý danh mục</h1>
-          <p className="font-body-md text-muted">Thêm, sửa hoặc xóa danh mục để nhóm các khóa học.</p>
+          <p className="font-body-md text-muted">Thêm, sửa hoặc xóa danh mục (gốc hoặc danh mục con) để nhóm các khóa học.</p>
         </div>
         <div className="header-filters">
           <div className="search-filter" style={{ marginRight: 16 }}>
@@ -171,15 +180,31 @@ export default function AdminCategories() {
               <thead>
                 <tr>
                   <th style={{ width: '30%' }}>Tên danh mục</th>
-                  <th style={{ width: '50%' }}>Mô tả</th>
-                  <th style={{ width: '20%', textAlign: 'right' }}>Hành động</th>
+                  <th style={{ width: '20%' }}>Cấp danh mục</th>
+                  <th style={{ width: '35%' }}>Mô tả</th>
+                  <th style={{ width: '15%', textAlign: 'right' }}>Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCategories.map((cat) => (
                   <tr key={cat.id} className="course-row">
                     <td>
-                      <span className="category-badge" style={{ fontSize: 13, padding: '6px 12px' }}>{cat.name}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span className="category-badge" style={{ fontSize: 13, padding: '6px 12px' }}>{cat.name}</span>
+                      </div>
+                    </td>
+                    <td>
+                      {cat.parent ? (
+                        <span style={{ fontSize: 12, background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: 12, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>folder_open</span>
+                          Con của: {cat.parent.name}
+                        </span>
+                      ) : (
+                        <span style={{ fontSize: 12, background: '#f3f4f6', color: '#374151', padding: '4px 10px', borderRadius: 12, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>folder</span>
+                          Danh mục gốc
+                        </span>
+                      )}
                     </td>
                     <td>
                       <p className="font-body-sm text-muted" style={{ margin: 0 }}>
@@ -223,9 +248,29 @@ export default function AdminCategories() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Nhập tên danh mục..."
+                    placeholder="Nhập tên danh mục (ví dụ: Lịch sử Việt Nam)..."
                     required
                   />
+                </div>
+
+                <div className="ic-form-group">
+                  <label className="font-label-md">Danh mục cha (Tùy chọn - nếu là danh mục con)</label>
+                  <select
+                    className="input-field"
+                    value={formData.parent_id || ''}
+                    onChange={(e) => setFormData({ ...formData, parent_id: e.target.value })}
+                  >
+                    <option value="">-- Không có (Danh mục gốc) --</option>
+                    {categories
+                      .filter(c => !editingCategory || c.id !== editingCategory.id)
+                      .filter(c => !c.parent_id) // Root categories only
+                      .map(parentCat => (
+                        <option key={parentCat.id} value={parentCat.id}>
+                           {parentCat.name}
+                        </option>
+                      ))
+                    }
+                  </select>
                 </div>
 
                 <div className="ic-form-group">
@@ -235,7 +280,7 @@ export default function AdminCategories() {
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Nhập mô tả danh mục..."
-                    style={{ minHeight: 120 }}
+                    style={{ minHeight: 100 }}
                   />
                 </div>
               </div>

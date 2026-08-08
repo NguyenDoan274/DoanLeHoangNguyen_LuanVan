@@ -152,7 +152,7 @@ export default function InstructorDashboard() {
           <div className="pending-reviews-panel card">
             <div className="panel-header">
               <h4 className="font-headline-sm" style={{ margin: 0 }}>Thống kê khóa học của tôi</h4>
-              <Link to="/instructor/courses" className="panel-link">XEM TẤT CẢ ({stats?.totalCourses})</Link>
+              <Link to="/instructor/revenue" className="panel-link">XEM TẤT CẢ ({stats?.totalCourses})</Link>
             </div>
             <div className="table-responsive">
               <table className="reviews-table">

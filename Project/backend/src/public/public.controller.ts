@@ -14,8 +14,8 @@ export class PublicController {
     }
 
     @Get('courses')
-    getPublishedCourses(@Query('name') name?: string){
-        return this.publicService.getPublishedCourses(name);
+    getPublishedCourses(@Query('name') name?: string, @Query('categoryId') categoryId?: string){
+        return this.publicService.getPublishedCourses(name, categoryId);
     }
 
     @Get('recomended-courses')

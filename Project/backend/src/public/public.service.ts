@@ -10,11 +10,22 @@ export class PublicService {
   ) {}
 
   async getCategories() {
-    const categories = await this.prisma.categories.findMany();
+    const categories = await this.prisma.categories.findMany({
+      include: {
+        parent: {
+          select: { id: true, name: true },
+        },
+        children: {
+          select: { id: true, name: true, description: true },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
     return {
       data: categories,
     }
   }
+
   async getAppliedPromotion(courseId: string, categoryId: string) {
     const now = new Date();
     const promotions = await this.prisma.promotions.findMany({
@@ -41,17 +52,38 @@ export class PublicService {
     return Math.max(...promotions.map(p => Number(p.discount_percentage)));
   }
 
-  async getPublishedCourses(name?:string) {
+  async getPublishedCourses(name?: string, categoryId?: string) {
+    let categoryIds: string[] = [];
+
+    if (categoryId) {
+      const subCategories = await this.prisma.categories.findMany({
+        where: { parent_id: categoryId },
+        select: { id: true },
+      });
+      categoryIds = [categoryId, ...subCategories.map((sc) => sc.id)];
+    }
+
     const courses = await this.prisma.courses.findMany({
       where: {
         status: 'PUBLISHED',
-        title: {
-          contains: name,
-          mode: 'insensitive',
-        },
+        ...(name && {
+          title: {
+            contains: name,
+            mode: 'insensitive',
+          },
+        }),
+        ...(categoryIds.length > 0 && {
+          category_id: { in: categoryIds },
+        }),
       },
       include: {
-        categories: true,
+        categories: {
+          include: {
+            parent: {
+              select: { id: true, name: true },
+            },
+          },
+        },
         users: {
           select: {
             full_name: true,
